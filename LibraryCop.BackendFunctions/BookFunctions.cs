@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using LibraryCop.BackendFunctions.Logic;
 
 namespace LibraryCop.BackendFunctions
 {
@@ -14,22 +15,20 @@ namespace LibraryCop.BackendFunctions
     {
         [FunctionName("books")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "books/{id:int}")] HttpRequest req,
-           int id, ILogger log)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "books/{isbn:long}")] HttpRequest req,
+           long isbn, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            SearchBookInteractor interactor= new SearchBookInteractor();
+            var book = await interactor.GetBook(isbn.ToString());
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            if(book == null)
+            {
+                return new NotFoundResult();
+            }
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult(book);
         }
     }
 }
