@@ -29,8 +29,8 @@ namespace LibraryCop.BackendFunctions.Logic
             if(book == null)
             {
                 var internetBookInfo = await GetBookFromInternet(isbn);
-                book = ParseInernetBook(internetBookInfo);
-                var rawTask = SaveRawBookLocally(internetBookInfo, book.ISBN, book.Publisher);
+                var rawTask = SaveRawBookLocally(internetBookInfo, isbn, "Unknown");
+                book = ParseInernetBook(internetBookInfo);                
                 var parsedTask = SaveBookLocally(book);
 
                 rawTask.Wait();
@@ -66,11 +66,12 @@ namespace LibraryCop.BackendFunctions.Logic
         private async Task<string> GetBookFromInternet(string isbn)
         {
             using HttpClient client = new();
+            string body = new StringBuilder().Append("{\"query\":{\"match\":{\"print_isbn_canonical\":").Append(isbn).Append("}}}").ToString();
             var request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri("https://www.boksala.is/elastic/boksala_index/_search"),
-                Content = new StringContent("", Encoding.UTF8, "application/json")
+                Content = new StringContent(body, Encoding.UTF8, "application/json")
         };
 
             var response = await client.SendAsync(request);
@@ -91,7 +92,7 @@ namespace LibraryCop.BackendFunctions.Logic
             Book book = new()
             {
                 ISBN = hit._source.print_isbn_canonical,
-                Author = hit._source.authors.First().name,
+                Author = hit._source.authors != null && hit._source.authors.Count() > 0 ? hit._source.authors.First().name : "Unknown",
                 Description = hit._source.description,
                 ImageUrl = hit._source.cover_image,
                 Link = hit._source.permalink,
