@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace LibraryCop.BackendFunctions.Logic
 
             if(book == null)
             {
-                var internetBookInfo = GetBookFromInternet(isbn);
+                var internetBookInfo = await GetBookFromInternet(isbn);
                 book = ParseInernetBook(internetBookInfo);
                 var rawTask = SaveRawBookLocally(internetBookInfo, book.ISBN, book.Publisher);
                 var parsedTask = SaveBookLocally(book);
@@ -62,9 +63,23 @@ namespace LibraryCop.BackendFunctions.Logic
             return null;
         }
 
-        private string GetBookFromInternet(string isbn)
+        private async Task<string> GetBookFromInternet(string isbn)
         {
-            return "{\"took\": 1,\"timed_out\": false,\"_shards\": {  \"total\": 1,  \"successful\": 1,  \"skipped\": 0,  \"failed\": 0},\"hits\": {  \"total\": {    \"value\": 1,    \"relation\": \"eq\"  },  \"max_score\": 12.730946,  \"hits\": [    {      \"_index\": \"boksala_index\",      \"_type\": \"_doc\",      \"_id\": \"dk1198887\",      \"_score\": 12.730946,      \"_source\": {        \"sku\": \"9789979332817\",        \"create_date\": \"2020-04-22 19:03:47\",        \"update_date\": \"2021-12-01 00:13:06\",        \"delete_date\": null,        \"print_isbn_canonical\": \"9789979332817\",        \"eisbn_canonical\": null,        \"title\": \"S\\u00c1 HL\\u00c6R BEST...! SAG\\u00d0I PABBI\",        \"publisher\": \"MALOGME1\",        \"kind\": \"book\",        \"format\": null,        \"contributers\": null,        \"language\": null,        \"sales_rights\": null,        \"exclude_sales_rights\": null,        \"description\": \" \",        \"publication_date\": null,        \"subtitle\": null,        \"cover_image\": \"https:\\/\\/www.boksala.is\\/wp-content\\/uploads\\/2017\\/10\\/9789979332817.jpg\",        \"edition\": \"1\",        \"off_sale_date_ok\": null,        \"page_count\": null,        \"imprint_name\": null,        \"publisher_list_price\": null,        \"authors\": [          {            \"name\": \"BERGSTR\\u00d6M, GUNILLA\"          }        ],        \"variations\": [],        \"min_price\": \"2790\",        \"max_price\": \"2790\",        \"variations_count\": 0,        \"price\": \"2790\",        \"book_type\": \"dk\",        \"book_type_cat\": \"B\\u00e6kur\",        \"book_type_rank\": 100,        \"product_categories_lvl\": {          \"lvl0\": [            \"Barna- og unglingab\\u00e6kur\"          ],          \"lvl1\": [            \"Barna- og unglingab\\u00e6kur > Barnab\\u00e6kur\"          ]        },        \"bokalistar\": null,        \"bokalistar_ids\": [],        \"bokalistar_lvl\": null,        \"bokalisti\": null,        \"permalink\": \"https:\\/\\/www.boksala.is\\/product\\/sa-hlaer-best-sagdi-pabbi\\/\"      }    }  ]}\r\n}";
+            using HttpClient client = new();
+            var request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://www.boksala.is/elastic/boksala_index/_search"),
+                Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+            var response = await client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            return result;
+            
+            //return "{\"took\": 1,\"timed_out\": false,\"_shards\": {  \"total\": 1,  \"successful\": 1,  \"skipped\": 0,  \"failed\": 0},\"hits\": {  \"total\": {    \"value\": 1,    \"relation\": \"eq\"  },  \"max_score\": 12.730946,  \"hits\": [    {      \"_index\": \"boksala_index\",      \"_type\": \"_doc\",      \"_id\": \"dk1198887\",      \"_score\": 12.730946,      \"_source\": {        \"sku\": \"9789979332817\",        \"create_date\": \"2020-04-22 19:03:47\",        \"update_date\": \"2021-12-01 00:13:06\",        \"delete_date\": null,        \"print_isbn_canonical\": \"9789979332817\",        \"eisbn_canonical\": null,        \"title\": \"S\\u00c1 HL\\u00c6R BEST...! SAG\\u00d0I PABBI\",        \"publisher\": \"MALOGME1\",        \"kind\": \"book\",        \"format\": null,        \"contributers\": null,        \"language\": null,        \"sales_rights\": null,        \"exclude_sales_rights\": null,        \"description\": \" \",        \"publication_date\": null,        \"subtitle\": null,        \"cover_image\": \"https:\\/\\/www.boksala.is\\/wp-content\\/uploads\\/2017\\/10\\/9789979332817.jpg\",        \"edition\": \"1\",        \"off_sale_date_ok\": null,        \"page_count\": null,        \"imprint_name\": null,        \"publisher_list_price\": null,        \"authors\": [          {            \"name\": \"BERGSTR\\u00d6M, GUNILLA\"          }        ],        \"variations\": [],        \"min_price\": \"2790\",        \"max_price\": \"2790\",        \"variations_count\": 0,        \"price\": \"2790\",        \"book_type\": \"dk\",        \"book_type_cat\": \"B\\u00e6kur\",        \"book_type_rank\": 100,        \"product_categories_lvl\": {          \"lvl0\": [            \"Barna- og unglingab\\u00e6kur\"          ],          \"lvl1\": [            \"Barna- og unglingab\\u00e6kur > Barnab\\u00e6kur\"          ]        },        \"bokalistar\": null,        \"bokalistar_ids\": [],        \"bokalistar_lvl\": null,        \"bokalisti\": null,        \"permalink\": \"https:\\/\\/www.boksala.is\\/product\\/sa-hlaer-best-sagdi-pabbi\\/\"      }    }  ]}\r\n}";
         }
 
         private Book ParseInernetBook(string json)
