@@ -20,7 +20,7 @@ namespace LibraryCop.BackendFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            SearchBookInteractor interactor= new SearchBookInteractor();
+            SearchBookInteractor interactor= new SearchBookInteractor(log);
             var book = await interactor.GetBook(isbn.ToString());
 
             if(book == null)
