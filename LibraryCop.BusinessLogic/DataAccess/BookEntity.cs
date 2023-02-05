@@ -13,7 +13,9 @@ namespace LibraryCop.BusinessLogic.DataAccess
     {
         public BookEntity()
         {
-
+            PartitionKey = string.Empty;
+            RowKey = string.Empty;
+            Author = string.Empty;
         }
 
         public BookEntity(Book book)
@@ -22,9 +24,11 @@ namespace LibraryCop.BusinessLogic.DataAccess
             PartitionKey = book.Publisher;
             Title = book.Title;
             Description = book.Description;
-            Author = book.Author;
-            ImageUrl= book.ImageUrl;
+            Author = book.Author ?? "Unknown";
+            ImageUrl = book.ImageUrl;
             Link = book.Link;
+            Format = book.Format;
+            PublishYear = book.PublishYear;
         }
 
         public string PartitionKey { get; set; }
@@ -32,10 +36,12 @@ namespace LibraryCop.BusinessLogic.DataAccess
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
 
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
         public string Author { get; set; }
-        public string ImageUrl { get; set; }
-        public string Link { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Link { get; set; }
+        public string? Format { get; set; }
+        public int? PublishYear { get; set; }
     }
 }

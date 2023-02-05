@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryCop.BackendFunctions.Logic.Entities
+namespace LibraryCop.BusinessLogic.DataAccess
 {
-
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable IDE1006 // Naming Styles
     public class BoksalaResult
     {
-        public int took { get; set; }
-        public bool timed_out { get; set; }
+        public int Took { get; set; }
+        public bool Timed_out { get; set; }
         public _Shards _shards { get; set; }
         public Hits hits { get; set; }
     }
@@ -97,5 +98,6 @@ namespace LibraryCop.BackendFunctions.Logic.Entities
     {
         public string name { get; set; }
     }
-
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }

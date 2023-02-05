@@ -1,4 +1,6 @@
 ﻿using Azure.Data.Tables;
+using BusinessLogic;
+using BusinessLogic.DataAccess;
 using LibraryCop.BackendFunctions;
 using LibraryCop.BusinessLogic;
 using LibraryCop.BusinessLogic.DataAccess;
@@ -30,9 +32,12 @@ namespace LibraryCop.BackendFunctions
         {
             var connectionString = Environment.GetEnvironmentVariable("ContentStorage.ConnectionString");
 
-            services.AddSingleton(new TableClient(connectionString, "LibraryCop"));
+            services.AddSingleton(new TableClient(connectionString, "Book"));
 
-            services.AddSingleton<IBookFinderDataAccess, BookFinderTableDataAccess>();
+            services.AddSingleton<IBookFinderDataAccess, BookTableDataAccess>();
+            services.AddSingleton<IBookFinderDataAccess, LeitirApiDataAccess>();
+            services.AddSingleton<IBookFinderDataAccess, BoksalaApiDataAccess>();
+            services.AddSingleton<IBookManagementDataAccess, BookTableDataAccess>();
             services.AddSingleton<BookFinderInteractor>();
         }
     }
