@@ -62,23 +62,26 @@ namespace BusinessLogic.DataAccess
                 var hit = result.hits.hits.First();
 
                 Book book = new(isbn, false)
-                {
-                    Author = hit._source.authors != null && hit._source.authors.Length > 0 ? hit._source.authors.First().name : "Unknown",
-                    Description = string.IsNullOrWhiteSpace(hit._source.description) ? null : hit._source.description,
-                    ImageUrl = hit._source.cover_image,
-                    Link = hit._source.permalink,
+                {                    
                     Publisher = hit._source.publisher,
-                    Title = hit._source.title,                    
+                    Detail = new BookDetail()
+                    {
+                        Author = hit._source.authors != null && hit._source.authors.Length > 0 ? hit._source.authors.First().name : "Unknown",
+                        Description = string.IsNullOrWhiteSpace(hit._source.description) ? null : hit._source.description,
+                        ImageUrl = hit._source.cover_image,
+                        Link = hit._source.permalink,
+                        Title = hit._source.title,
+                    }                                 
                 };
 
-                var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                book.Author = textInfo.ToTitleCase(book.Author.ToLower());
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;                
                 book.Publisher = textInfo.ToTitleCase(book.Publisher.ToLower());
-                book.Title = textInfo.ToTitleCase(book.Title.ToLower());
+                book.Detail.Author = textInfo.ToTitleCase(book.Detail.Author.ToLower());
+                book.Detail.Title = textInfo.ToTitleCase(book.Detail.Title.ToLower());
 
                 if (int.TryParse(hit._source.publication_date.ToString(), out int year))
                 {
-                    book.PublishYear = year;
+                    book.Detail.PublishYear = year;
                 }
 
                 if(hit._source.product_categories_lvl != null)

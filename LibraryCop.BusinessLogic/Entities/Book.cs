@@ -10,26 +10,24 @@ namespace LibraryCop.BusinessLogic.Entities
     {
         public Book(string isbn, bool saved)
         {
-            ISBN = isbn;            
+            ISBN = isbn;
             Saved = saved;
 
-            Title = string.Empty;
             Publisher = string.Empty;
+            Detail = new();
+            State = new();
+            Operations = new List<BookOperation>();
             Labels = new List<string>();
-            Created = DateTime.Today;
         }
 
         internal bool Saved { get; set; }
         public string ISBN { get; set; }
-        public string Title { get; set; }
         public string Publisher { get; set; }
-        public int? PublishYear { get; set; }
-        public string? Description { get; set; }
-        public string? Author { get; set; }
-        public string? ImageUrl { get; set; }
-        public string? Link { get; set; }        
-        public string? Format { get; set; }
+        public BookDetail Detail { get; set; }
+        public BookState State { get; set; }
+
+        public IList<BookOperation> Operations { get; set; }
+
         public IList<string> Labels { get; set; }
-        public DateTime Created { get; set; }
     }
 }

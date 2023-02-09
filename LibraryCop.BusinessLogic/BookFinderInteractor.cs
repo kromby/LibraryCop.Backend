@@ -31,16 +31,53 @@ namespace LibraryCop.BusinessLogic
 
                 if (book != null)
                 {
-                    if(!book.Saved)
+                    if (book.Saved)
                     {
+                        var stateTask = GetState(isbn);
+                        var labelsTask = GetLabels(isbn);
+
+                        stateTask.Wait();
+                        book.State = stateTask.Result;
+                        labelsTask.Wait();
+                        book.Labels = labelsTask.Result;
+                    }
+                    else
+                    {
+                        book.State = new BookState() { State = State.NotOwned };
                         await _bookManagementDataAccess.SaveBook(book);
                     }
+
+                    book.Operations = await GetOperations(isbn, book.State.State);
 
                     break;
                 }
             }
 
             return book;
+        }
+
+        public async Task<IList<BookOperation>> GetOperations(string isbn, State state)
+        {
+            var list = new List<BookOperation>();
+
+            if (state.Equals(State.NotOwned))
+            {
+                list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Path = $"/books/{isbn}/" });
+                list.Add(new BookOperation() { ID = 2, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
+            }
+
+            return list;
+        }
+
+        public async Task<BookState> GetState(string isbn)
+        {
+            return new BookState() { State = State.In };
+        }
+
+        public async Task<IList<string>> GetLabels(string isbn)
+        {
+            var list = new List<string>();
+            return list;
         }
     }
 }

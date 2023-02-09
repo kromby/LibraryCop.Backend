@@ -56,20 +56,23 @@ namespace BusinessLogic.DataAccess
                 var docs = result.docs.First();
 
                 Book book = new(isbn, false)
-                {
-                    Title = docs.pnx.display.title.First(),
-                    Author = docs.pnx.addata.au != null ? docs.pnx.addata.au.First() : docs.pnx.display.creator != null ? docs.pnx.display.creator.First() : "Unknown",
+                {                    
                     Publisher = docs.pnx.addata.pub.First() ?? docs.pnx.display.publisher.First(),               
+                    Detail = new BookDetail()
+                    {
+                        Title = docs.pnx.display.title.First(),
+                        Author = docs.pnx.addata.au != null ? docs.pnx.addata.au.First() : docs.pnx.display.creator != null ? docs.pnx.display.creator.First() : "Unknown",
+                    }
                 };
 
                 if(docs.pnx.display.format != null)
                 {
-                    book.Format = docs.pnx.display.format.First();
+                    book.Detail.Format = docs.pnx.display.format.First();
                 }
 
                 if (int.TryParse(docs.pnx.addata.date.First(), out int year))
                 {
-                    book.PublishYear = year;
+                    book.Detail.PublishYear = year;
                 }
 
                 foreach(var subject in docs.pnx.display.subject)

@@ -22,13 +22,13 @@ namespace LibraryCop.BusinessLogic.DataAccess
         {
             RowKey = book.ISBN;
             PartitionKey = book.Publisher;
-            Title = book.Title;
-            Description = book.Description;
-            Author = book.Author ?? "Unknown";
-            ImageUrl = book.ImageUrl;
-            Link = book.Link;
-            Format = book.Format;
-            PublishYear = book.PublishYear;
+            Title = book.Detail.Title;
+            Description = book.Detail.Description;
+            Author = book.Detail.Author ?? "Unknown";
+            ImageUrl = book.Detail.ImageUrl;
+            Link = book.Detail.Link;
+            Format = book.Detail.Format;
+            PublishYear = book.Detail.PublishYear;
         }
 
         public string PartitionKey { get; set; }

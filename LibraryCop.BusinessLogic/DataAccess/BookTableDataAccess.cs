@@ -35,16 +35,19 @@ namespace LibraryCop.BusinessLogic.DataAccess
                 _log.LogInformation("[{Class}.{Method}] Book '{isbn}' found.", nameof(BookTableDataAccess), nameof(GetBook), isbn);
 
                 var book = new Book(bookEntity.RowKey, true)
-                {
-                    Author = bookEntity.Author,
-                    Description = bookEntity.Description,
-                    ImageUrl = bookEntity.ImageUrl,
-                    Link = bookEntity.Link,
+                {                   
                     Publisher = bookEntity.PartitionKey,
-                    Title = bookEntity.Title ?? string.Empty,
-                    Created = bookEntity.Timestamp.HasValue ? bookEntity.Timestamp.Value.LocalDateTime : DateTime.Today,
-                    Format = bookEntity.Format,
-                    PublishYear = bookEntity.PublishYear
+                    Detail = new BookDetail()
+                    {
+                        Author = bookEntity.Author,
+                        Description = bookEntity.Description,
+                        ImageUrl = bookEntity.ImageUrl,
+                        Link = bookEntity.Link,
+                        Title = bookEntity.Title ?? string.Empty,
+                        Created = bookEntity.Timestamp.HasValue ? bookEntity.Timestamp.Value.LocalDateTime : DateTime.Today,
+                        Format = bookEntity.Format,
+                        PublishYear = bookEntity.PublishYear
+                    }                   
                 };
 
                 return book;
