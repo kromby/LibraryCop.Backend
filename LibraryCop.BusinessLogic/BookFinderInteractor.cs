@@ -65,6 +65,10 @@ namespace LibraryCop.BusinessLogic
                 list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Path = $"/books/{isbn}/" });
                 list.Add(new BookOperation() { ID = 2, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
             }
+            else if(state.Equals(State.In))
+            {
+                list.Add(new BookOperation() { ID = 1, Name = "Taka út", Description = "Fá bók lánaða", Path = $"/books/{isbn}/" });                
+            }
 
             return list;
         }
