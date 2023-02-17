@@ -1,5 +1,5 @@
-﻿using LibraryCop.BusinessLogic;
-using LibraryCop.BusinessLogic.DataAccess;
+﻿using BusinessLogic.DataAccess.Model;
+using LibraryCop.BusinessLogic;
 using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogic.DataAccess
+namespace LibraryCop.BusinessLogic.DataAccess
 {
     public class BoksalaApiDataAccess : IBookFinderDataAccess
     {

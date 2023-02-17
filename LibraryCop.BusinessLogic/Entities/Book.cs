@@ -15,7 +15,7 @@ namespace LibraryCop.BusinessLogic.Entities
 
             Publisher = string.Empty;
             Detail = new();
-            State = new();
+            State = new(isbn, Entities.State.NotOwned, Guid.Empty);
             Operations = new List<BookOperation>();
             Labels = new List<string>();
         }

@@ -1,6 +1,7 @@
 ﻿using Azure.Data.Tables;
 using BusinessLogic;
 using BusinessLogic.DataAccess;
+using BusinessLogic.DataAccess.Model;
 using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
 using System;
@@ -29,7 +30,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
         {
             _log.LogInformation("[{Class}.{Method}] Looking for book '{isbn}'.", nameof(BookTableDataAccess), nameof(GetBook), isbn);
 
-            var asyncResults = _tableClient.QueryAsync<BookEntity>(x => x.RowKey == isbn);
+            var asyncResults = _tableClient.QueryAsync<BookModel>(x => x.RowKey == isbn);
             await foreach (var bookEntity in asyncResults)
             {
                 _log.LogInformation("[{Class}.{Method}] Book '{isbn}' found.", nameof(BookTableDataAccess), nameof(GetBook), isbn);
@@ -59,8 +60,8 @@ namespace LibraryCop.BusinessLogic.DataAccess
 
         public async Task SaveBook(Book book)
         {
-            var entity = new BookEntity(book);
-            await _tableClient.UpsertEntityAsync<BookEntity>(entity);
+            var entity = new BookModel(book);
+            await _tableClient.UpsertEntityAsync<BookModel>(entity);
         }
     }
 }

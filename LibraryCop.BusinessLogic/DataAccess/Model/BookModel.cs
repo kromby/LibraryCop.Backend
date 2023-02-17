@@ -7,18 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryCop.BusinessLogic.DataAccess
+namespace BusinessLogic.DataAccess.Model
 {
-    internal class BookEntity : ITableEntity
+    internal class BookModel : ITableEntity
     {
-        public BookEntity()
+        public BookModel()
         {
             PartitionKey = string.Empty;
             RowKey = string.Empty;
             Author = string.Empty;
         }
 
-        public BookEntity(Book book)
+        public BookModel(Book book)
         {
             RowKey = book.ISBN;
             PartitionKey = book.Publisher;

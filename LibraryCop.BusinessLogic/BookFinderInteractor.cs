@@ -43,7 +43,6 @@ namespace LibraryCop.BusinessLogic
                     }
                     else
                     {
-                        book.State = new BookState() { State = State.NotOwned };
                         await _bookManagementDataAccess.SaveBook(book);
                     }
 
@@ -75,7 +74,7 @@ namespace LibraryCop.BusinessLogic
 
         public async Task<BookState> GetState(string isbn)
         {
-            return new BookState() { State = State.In };
+            return new BookState(isbn, State.In, Guid.Empty);
         }
 
         public async Task<IList<string>> GetLabels(string isbn)

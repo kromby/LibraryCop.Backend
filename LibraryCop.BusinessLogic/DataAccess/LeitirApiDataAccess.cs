@@ -1,4 +1,5 @@
 ﻿using Azure;
+using BusinessLogic.DataAccess.Model;
 using LibraryCop.BusinessLogic;
 using LibraryCop.BusinessLogic.DataAccess;
 using LibraryCop.BusinessLogic.Entities;
@@ -10,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogic.DataAccess
+namespace LibraryCop.BusinessLogic.DataAccess
 {
     public class LeitirApiDataAccess : IBookFinderDataAccess
     {

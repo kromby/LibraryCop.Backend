@@ -5,9 +5,9 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackendFunctions", "LibraryCop.BackendFunctions\BackendFunctions.csproj", "{423D43DD-8E5D-4B9A-846F-9FCD41C3D568}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "LibraryCop.BusinessLogic\BusinessLogic.csproj", "{6D78FA43-ECAB-4278-BBA9-418CC5FF9C43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "LibraryCop.BusinessLogic\BusinessLogic.csproj", "{6D78FA43-ECAB-4278-BBA9-418CC5FF9C43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{820C73E8-2DA1-422B-8339-66E3E29B8AEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{820C73E8-2DA1-422B-8339-66E3E29B8AEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
