@@ -9,31 +9,36 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using LibraryCop.BusinessLogic.Entities;
 using LibraryCop.BusinessLogic;
+using BusinessLogic.Entities;
 
 namespace BackendFunctions
 {
     public class LibraryCatalogueFunctions
     {
         private readonly LibraryCatalogueInteractor _interactor;
+        private readonly AuthenticationInteractor _authenticationInteractor;
 
-        public LibraryCatalogueFunctions(LibraryCatalogueInteractor libraryCatalogueInteractor)
+        public LibraryCatalogueFunctions(AuthenticationInteractor authenticationInteractor, LibraryCatalogueInteractor libraryCatalogueInteractor)
         {
             _interactor = libraryCatalogueInteractor;
+            _authenticationInteractor = authenticationInteractor;
         }
 
         [FunctionName("libraryCatalogue")]
         public async Task<IActionResult> RunLibraryBooks(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "libraries/books")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "libraries/books/{isbn:long}")] HttpRequest req,
+            long isbn, ILogger log)
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(LibraryCatalogueFunctions), nameof(RunLibraryBooks));
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            BookState state = JsonConvert.DeserializeObject<BookState>(requestBody);
+            if(!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out AuthenticatedUser user, log))
+            {
+                return new UnauthorizedResult();
+            }
 
-            var resultState = await _interactor.AddBook(state.ISBN, state.LibraryID, state.CreatedBy);
+            var resultState = await _interactor.AddBook(isbn.ToString(), user.LibraryID, user.UserID);
 
-            return new CreatedResult($"/library/{resultState.LibraryID}/books/{resultState.ISBN}", resultState);
+            return new CreatedResult($"/libraries/{resultState.LibraryID}/books/{resultState.ISBN}", resultState);
         }
     }
 }
