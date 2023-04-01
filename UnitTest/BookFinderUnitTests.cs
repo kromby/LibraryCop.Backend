@@ -12,6 +12,7 @@ namespace UnitTest
         private readonly Mock<IBookFinderDataAccess> _bookFinderDaNotFoundMock;
         private readonly Mock<IBookFinderDataAccess> _bookFinderDaMock;
         private readonly Mock<IBookManagementDataAccess> _bookManagementDaMock;
+        private readonly Mock<LibraryCatalogueInteractor> _libraryCatalogueInteractorMock;
         private readonly Mock<ILogger<BookFinderInteractor>> _interactorLog;
 
         public BookFinderUnitTests()
@@ -19,6 +20,7 @@ namespace UnitTest
             _bookFinderDaNotFoundMock = new Mock<IBookFinderDataAccess> { CallBase = true };
             _bookFinderDaMock = new Mock<IBookFinderDataAccess>() { CallBase = true };
             _bookManagementDaMock = new Mock<IBookManagementDataAccess>(MockBehavior.Strict) { CallBase = true };
+            _libraryCatalogueInteractorMock = new Mock<LibraryCatalogueInteractor> { CallBase = true };
             _interactorLog = new Mock<ILogger<BookFinderInteractor>>();
         }
 
@@ -27,6 +29,7 @@ namespace UnitTest
         {
             // ARRANGE
             Book book = new("547946546", false);
+            Guid libraryID = Guid.NewGuid();
             _bookFinderDaNotFoundMock.Setup(f => f.GetBook(It.IsAny<string>()));
             _bookFinderDaNotFoundMock.Setup(f => f.Priority).Returns(1);
             _bookFinderDaMock.Setup(f => f.GetBook(book.ISBN)).ReturnsAsync(book);
@@ -38,10 +41,10 @@ namespace UnitTest
             };
             _bookManagementDaMock.Setup(m => m.SaveBook(book)).Returns(Task.Delay(100)).Verifiable();
 
-            BookFinderInteractor interactor = new(list, _bookManagementDaMock.Object, _interactorLog.Object);            
+            BookFinderInteractor interactor = new(list, _bookManagementDaMock.Object, _libraryCatalogueInteractorMock.Object, _interactorLog.Object);            
 
             // ACT
-            var result = await interactor.GetBook(book.ISBN);
+            var result = await interactor.GetBook(book.ISBN, libraryID);
 
             // ASSERT
             Assert.NotNull(result);
@@ -61,7 +64,7 @@ namespace UnitTest
             };
 
             // ACT
-            var result = new BookFinderInteractor(list, _bookManagementDaMock.Object, _interactorLog.Object);
+            var result = new BookFinderInteractor(list, _bookManagementDaMock.Object, _libraryCatalogueInteractorMock.Object, _interactorLog.Object);
 
             // ASSERT
             Assert.NotNull(result);
@@ -79,10 +82,10 @@ namespace UnitTest
             // ACT & ASSERT
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             _ = Assert.Throws<ArgumentNullException>(
-                () => new BookFinderInteractor(null, null, null));
+                () => new BookFinderInteractor(null, null, _libraryCatalogueInteractorMock.Object, null));
 
             _ = Assert.Throws<ArgumentNullException>(
-                () => new BookFinderInteractor(list, null, null));
+                () => new BookFinderInteractor(list, null, _libraryCatalogueInteractorMock.Object, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
     }

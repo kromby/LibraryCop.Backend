@@ -10,5 +10,7 @@ namespace LibraryCop.BusinessLogic
     public interface ILibraryCatalogoueDataAccess
     {
         Task SaveBookState(BookState state);
+
+        Task<BookState?> GetState(string isbn, Guid libraryID);
     }
 }

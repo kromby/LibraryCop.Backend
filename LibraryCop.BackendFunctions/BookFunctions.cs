@@ -10,16 +10,20 @@ using Newtonsoft.Json;
 using LibraryCop.BackendFunctions.Logic;
 using System.Runtime.CompilerServices;
 using LibraryCop.BusinessLogic;
+using BackendFunctions;
+using LibraryCop.BusinessLogic.Entities;
 
 namespace LibraryCop.BackendFunctions
 {
     public class BookFunctions
     {
         private readonly BookFinderInteractor _interactor;
+        private readonly AuthenticationInteractor _authenticationInteractor;
 
-        public BookFunctions(BookFinderInteractor bookFinderInteractor)
+        public BookFunctions(BookFinderInteractor bookFinderInteractor, AuthenticationInteractor authenticationInteractor)
         {
             _interactor = bookFinderInteractor;
+            _authenticationInteractor = authenticationInteractor;
         }
 
         [FunctionName("books")]
@@ -29,7 +33,12 @@ namespace LibraryCop.BackendFunctions
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(BookFunctions), nameof(Run));
 
-            var book = await _interactor.GetBook(isbn.ToString());
+            if (!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out AuthenticatedUser user, log))
+            {
+                return new UnauthorizedResult();
+            }
+
+            var book = await _interactor.GetBook(isbn.ToString(), user.LibraryID);
 
             if (book == null)
             {

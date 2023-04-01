@@ -24,7 +24,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
             _log = log;
         }
 
-        public int Priority { get; private set; }
+        public int Priority { get; private set; }        
 
         public async Task<Book?> GetBook(string isbn)
         {
@@ -56,7 +56,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
 
             _log.LogInformation("[{Class}.{Method}] Book '{isbn}' not found.", nameof(BookTableDataAccess), nameof(GetBook), isbn);
             return null;
-        }
+        }        
 
         public async Task SaveBook(Book book)
         {

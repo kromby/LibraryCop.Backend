@@ -10,9 +10,7 @@ namespace LibraryCop.BusinessLogic
 {
     public interface IBookManagementDataAccess
     {
-        public Task SaveBook(Book book);
-
-        //public int GetState { get; set; }
+        public Task SaveBook(Book book);        
 
         //public int GetStats { get; set; }
 

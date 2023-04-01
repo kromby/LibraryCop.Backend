@@ -1,4 +1,5 @@
-﻿using LibraryCop.BusinessLogic.Entities;
+﻿using LibraryCop.BusinessLogic.DataAccess;
+using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace LibraryCop.BusinessLogic
 {
     public class LibraryCatalogueInteractor
     {
-        private ILibraryCatalogoueDataAccess _libraryCatalogoueDataAccess;
+        private readonly ILibraryCatalogoueDataAccess _libraryCatalogoueDataAccess;
         private readonly ILogger<LibraryCatalogueInteractor> _log;
 
         public LibraryCatalogueInteractor(ILibraryCatalogoueDataAccess libraryCatalogoueDataAccess, ILogger<LibraryCatalogueInteractor> log)
@@ -21,13 +22,15 @@ namespace LibraryCop.BusinessLogic
 
         public async Task<BookState> AddBook(string isbn, Guid libraryID, Guid userID)
         {
+            _log.LogInformation("[{Class}.{Method}] Saving state for book '{isbn}', libraryID '{libraryID}'.", nameof(LibraryCatalogueInteractor), nameof(AddBook), isbn, libraryID);
+
             if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
             if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
             if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
 
-            if (!VerifyISBN(isbn)) throw new ArgumentException(nameof(isbn), "ISBN is invalid.");
+            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
 
-            BookState bookState = new BookState(isbn, State.In, libraryID)
+            BookState bookState = new(isbn, State.In, libraryID)
             {
                 Created = DateTime.Now,
                 CreatedBy = userID
@@ -88,6 +91,14 @@ namespace LibraryCop.BusinessLogic
 
             // Compare the calculated check digit to the actual check digit
             return (isbn[12] - '0') == checkDigit;
+        }
+
+        public async Task<BookState> GetBookState(string isbn, Guid libraryID) {
+            var state = await _libraryCatalogoueDataAccess.GetState(isbn, libraryID);
+
+            state ??= new BookState(isbn, State.NotOwned, libraryID);
+
+            return state;
         }
     }
 }

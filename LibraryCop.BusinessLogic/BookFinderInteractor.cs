@@ -9,17 +9,19 @@ namespace LibraryCop.BusinessLogic
         private readonly IList<IBookFinderDataAccess> _bookFinderDataAccesses;
         private readonly IBookManagementDataAccess _bookManagementDataAccess;
         private readonly ILogger<BookFinderInteractor> _log;
+        private readonly LibraryCatalogueInteractor _libraryCatalogueInteractor;
 
-        public BookFinderInteractor(IList<IBookFinderDataAccess> bookFinderDataAccesses, IBookManagementDataAccess bookManagementDataAccess, ILogger<BookFinderInteractor> log)
+        public BookFinderInteractor(IList<IBookFinderDataAccess> bookFinderDataAccesses, IBookManagementDataAccess bookManagementDataAccess, LibraryCatalogueInteractor libraryCatalogueInteractor, ILogger<BookFinderInteractor> log)
         {
             if (bookFinderDataAccesses == null || bookFinderDataAccesses.Count == 0)
                 throw new ArgumentNullException(nameof(bookFinderDataAccesses), "Can not be null or empty.");
             _bookFinderDataAccesses = bookFinderDataAccesses;
             _bookManagementDataAccess = bookManagementDataAccess;
+            _libraryCatalogueInteractor = libraryCatalogueInteractor;
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
-        public async Task<Book?> GetBook(string isbn)
+        public async Task<Book?> GetBook(string isbn, Guid libraryID)
         {
             _log.LogInformation("[{Method}] Looking for book '{isbn}'.", nameof(GetBook), isbn);
 
@@ -33,7 +35,7 @@ namespace LibraryCop.BusinessLogic
                 {
                     if (book.Saved)
                     {
-                        var stateTask = GetState(isbn);
+                        var stateTask = GetState(isbn, libraryID);
                         var labelsTask = GetLabels(isbn);
 
                         stateTask.Wait();
@@ -61,19 +63,26 @@ namespace LibraryCop.BusinessLogic
 
             if (state.Equals(State.NotOwned))
             {
-                list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Path = $"/books/{isbn}/" });
-                list.Add(new BookOperation() { ID = 2, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
-            }
+                list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Path = $"/libraries/books/{isbn}" });
+                //list.Add(new BookOperation() { ID = 2, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
+            }            
             else if(state.Equals(State.In))
             {
                 list.Add(new BookOperation() { ID = 1, Name = "Taka út", Description = "Fá bók lánaða", Path = $"/books/{isbn}/" });                
+            }
+            else if (state.Equals(State.OnLoan))
+            {
+
             }
 
             return list;
         }
 
-        public async Task<BookState> GetState(string isbn)
+        public async Task<BookState> GetState(string isbn, Guid libraryID)
         {
+            var state = await _libraryCatalogueInteractor.GetBookState(isbn, libraryID);
+
+            if(state != null) { return state; }
             return new BookState(isbn, State.In, Guid.Empty);
         }
 

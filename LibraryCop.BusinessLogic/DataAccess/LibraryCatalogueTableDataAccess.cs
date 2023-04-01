@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using BusinessLogic.DataAccess.Model;
 using LibraryCop.BusinessLogic.DataAccess.Model;
 using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,28 @@ namespace LibraryCop.BusinessLogic.DataAccess
         {
             _tableClient = new TableClient(connectionInfo.ConnectionString, "State");
             _log = log;
+        }
+
+        public async Task<BookState?> GetState(string isbn, Guid libraryID)
+        {
+            _log.LogInformation("[{Class}.{Method}] Saving state for book '{isbn}'.", nameof(LibraryCatalogueTableDataAccess), nameof(GetState), isbn);
+
+            var asyncResults = _tableClient.QueryAsync<StateModel>(x => x.RowKey == isbn && x.PartitionKey == libraryID.ToString());
+            await foreach(var state in asyncResults)
+            {
+                _log.LogInformation("[{Class}.{Method}] Book state '{isbn}' found.", nameof(LibraryCatalogueTableDataAccess), nameof(GetState), isbn);
+
+                var bookState = new BookState(isbn, Enum.Parse<State>(state.State.ToString()), libraryID)
+                {
+                    CreatedBy = state.CreatedBy,
+                    Created = state.Created,                    
+                };
+
+                return bookState;
+            }
+
+            _log.LogInformation("[{Class}.{Method}] Book '{isbn}' not found.", nameof(LibraryCatalogueTableDataAccess), nameof(GetState), isbn);
+            return null;
         }
 
         public async Task SaveBookState(BookState state)
