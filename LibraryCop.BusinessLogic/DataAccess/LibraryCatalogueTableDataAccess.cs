@@ -51,7 +51,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
 
             try
             {
-                var response = await _tableClient.AddEntityAsync<StateModel>(model);
+                var response = await _tableClient.UpsertEntityAsync<StateModel>(model);
 
                 _log.LogInformation("[{Class}.{Method}] State save for '{isbn}' - '{message}'.", nameof(LibraryCatalogueTableDataAccess), nameof(SaveBookState), state.ISBN, response.Status);
 

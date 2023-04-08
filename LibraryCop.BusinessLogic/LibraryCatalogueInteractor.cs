@@ -27,7 +27,6 @@ namespace LibraryCop.BusinessLogic
             if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
             if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
             if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
-
             if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
 
             BookState bookState = new(isbn, State.In, libraryID)
@@ -35,6 +34,32 @@ namespace LibraryCop.BusinessLogic
                 Created = DateTime.Now,
                 CreatedBy = userID
             };
+
+            await _libraryCatalogoueDataAccess.SaveBookState(bookState);
+
+            return bookState;
+        }
+
+        public async Task<BookState> BorrowBook(string isbn, Guid libraryID, Guid userID)
+        {
+            _log.LogInformation("[{Class}.{Method}] Saving state for book '{isbn}', libraryID '{libraryID}'.", nameof(LibraryCatalogueInteractor), nameof(BorrowBook), isbn, libraryID);
+
+            if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
+            if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
+            if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
+            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
+
+            BookState? bookState = await _libraryCatalogoueDataAccess.GetState(isbn, libraryID);
+
+            bookState ??= new(isbn, State.In, libraryID)
+                {
+                    Created = DateTime.Now,
+                    CreatedBy = userID
+                };
+
+            bookState.State = (bookState.State == State.In) ? State.OnLoan : State.In;
+            bookState.Changed = DateTime.Now;
+            bookState.ChangedBy = userID;
 
             await _libraryCatalogoueDataAccess.SaveBookState(bookState);
 

@@ -20,7 +20,9 @@ namespace UnitTest
             _bookFinderDaNotFoundMock = new Mock<IBookFinderDataAccess> { CallBase = true };
             _bookFinderDaMock = new Mock<IBookFinderDataAccess>() { CallBase = true };
             _bookManagementDaMock = new Mock<IBookManagementDataAccess>(MockBehavior.Strict) { CallBase = true };
-            _libraryCatalogueInteractorMock = new Mock<LibraryCatalogueInteractor> { CallBase = true };
+            Mock<ILibraryCatalogoueDataAccess> libraryCatalogueDataAccess = new();
+            Mock<ILogger<LibraryCatalogueInteractor>> libraryCatalogueLogger = new Mock<ILogger<LibraryCatalogueInteractor>>();
+            _libraryCatalogueInteractorMock = new Mock<LibraryCatalogueInteractor>(libraryCatalogueDataAccess.Object, libraryCatalogueLogger.Object) { CallBase = true };
             _interactorLog = new Mock<ILogger<BookFinderInteractor>>();
         }
 

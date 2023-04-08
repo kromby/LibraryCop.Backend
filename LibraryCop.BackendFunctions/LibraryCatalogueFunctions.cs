@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using LibraryCop.BusinessLogic.Entities;
 using LibraryCop.BusinessLogic;
 using BusinessLogic.Entities;
+using System.Net.Http;
 
 namespace BackendFunctions
 {
@@ -26,7 +27,7 @@ namespace BackendFunctions
 
         [FunctionName("libraryCatalogue")]
         public async Task<IActionResult> RunLibraryBooks(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "libraries/books/{isbn:long}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", "put", Route = "libraries/books/{isbn:long}")] HttpRequest req,
             long isbn, ILogger log)
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(LibraryCatalogueFunctions), nameof(RunLibraryBooks));
@@ -36,9 +37,20 @@ namespace BackendFunctions
                 return new UnauthorizedResult();
             }
 
-            var resultState = await _interactor.AddBook(isbn.ToString(), user.LibraryID, user.UserID);
-
-            return new CreatedResult($"/libraries/{resultState.LibraryID}/books/{resultState.ISBN}", resultState);
+            if (req.Method == HttpMethod.Post.ToString())
+            {
+                var resultState = await _interactor.AddBook(isbn.ToString(), user.LibraryID, user.UserID);
+                return new CreatedResult($"/libraries/{resultState.LibraryID}/books/{resultState.ISBN}", resultState);
+            }
+            else if (req.Method == HttpMethod.Put.ToString())
+            {
+                var resultState = await _interactor.BorrowBook(isbn.ToString(), user.LibraryID, user.UserID);
+                return new OkObjectResult(resultState);
+            }
+            else
+            {
+                return new NotFoundResult();
+            }    
         }
     }
 }

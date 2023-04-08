@@ -48,7 +48,7 @@ namespace LibraryCop.BusinessLogic
                         await _bookManagementDataAccess.SaveBook(book);
                     }
 
-                    book.Operations = await GetOperations(isbn, book.State.State);
+                    book.Operations = GetOperations(isbn, book.State.State);
 
                     break;
                 }
@@ -57,22 +57,22 @@ namespace LibraryCop.BusinessLogic
             return book;
         }
 
-        public async Task<IList<BookOperation>> GetOperations(string isbn, State state)
+        public static IList<BookOperation> GetOperations(string isbn, State state)
         {
             var list = new List<BookOperation>();
 
             if (state.Equals(State.NotOwned))
             {
-                list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Path = $"/libraries/books/{isbn}" });
-                //list.Add(new BookOperation() { ID = 2, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
+                list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Method = HttpMethod.Post.ToString(), Path = $"/libraries/books/{isbn}" });
+                //list.Add(new BookOperation() { ID = 4, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
             }            
             else if(state.Equals(State.In))
             {
-                list.Add(new BookOperation() { ID = 1, Name = "Taka út", Description = "Fá bók lánaða", Path = $"/books/{isbn}/" });                
+                list.Add(new BookOperation() { ID = 2, Name = "Taka út", Description = "Fá bók lánaða", Method = HttpMethod.Put.ToString(), Path = $"/libraries/books/{isbn}" });                
             }
             else if (state.Equals(State.OnLoan))
             {
-
+                list.Add(new BookOperation() { ID = 3, Name = "Skila", Description = "Skila bók", Method = HttpMethod.Put.ToString(), Path = $"/libraries/books/{isbn}" });
             }
 
             return list;
@@ -86,7 +86,7 @@ namespace LibraryCop.BusinessLogic
             return new BookState(isbn, State.In, Guid.Empty);
         }
 
-        public async Task<IList<string>> GetLabels(string isbn)
+        public static async Task<IList<string>> GetLabels(string isbn)
         {
             var list = new List<string>();
             return list;

@@ -14,6 +14,7 @@ namespace LibraryCop.BusinessLogic.Entities
 
         public string Description { get; set; }
 
+        public String Method { get; set; }
         public string Path { get; set; }
     }
 }
