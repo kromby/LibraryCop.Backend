@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LibraryCop.BusinessLogic
 {
-    public interface ILibraryCatalogoueDataAccess
+    public interface ILibraryCatalogueDataAccess
     {
         Task SaveBookState(BookState state);
 

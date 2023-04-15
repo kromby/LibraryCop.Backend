@@ -36,12 +36,12 @@ namespace LibraryCop.BusinessLogic
                     if (book.Saved)
                     {
                         var stateTask = GetState(isbn, libraryID);
-                        var labelsTask = GetLabels(isbn);
+                        var labelsTask = GetLabels(/*isbn*/);
 
                         stateTask.Wait();
                         book.State = stateTask.Result;
-                        labelsTask.Wait();
-                        book.Labels = labelsTask.Result;
+                        //labelsTask.Wait();
+                        book.Labels = labelsTask; //.Result;
                     }
                     else
                     {
@@ -83,10 +83,10 @@ namespace LibraryCop.BusinessLogic
             var state = await _libraryCatalogueInteractor.GetBookState(isbn, libraryID);
 
             if(state != null) { return state; }
-            return new BookState(isbn, State.In, Guid.Empty);
+            return new BookState(isbn, State.NotOwned, libraryID);
         }
 
-        public static async Task<IList<string>> GetLabels(string isbn)
+        public static IList<string> GetLabels(/*string isbn*/)
         {
             var list = new List<string>();
             return list;

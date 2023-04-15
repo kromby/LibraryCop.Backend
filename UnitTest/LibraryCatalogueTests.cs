@@ -13,12 +13,12 @@ namespace UnitTest
 {
     public class LibraryCatalogueTests
     {
-        private readonly Mock<ILibraryCatalogoueDataAccess> _libraryCatalogueDaMock;
+        private readonly Mock<ILibraryCatalogueDataAccess> _libraryCatalogueDaMock;
         private readonly Mock<ILogger<LibraryCatalogueInteractor>> _interactorLog;
 
         public LibraryCatalogueTests()
         {
-            _libraryCatalogueDaMock = new Mock<ILibraryCatalogoueDataAccess>(MockBehavior.Strict) { CallBase = true };
+            _libraryCatalogueDaMock = new Mock<ILibraryCatalogueDataAccess>(MockBehavior.Strict) { CallBase = true };
             _interactorLog = new Mock<ILogger<LibraryCatalogueInteractor>>();
         }
 

@@ -11,23 +11,19 @@ namespace LibraryCop.BusinessLogic
 {
     public class LibraryCatalogueInteractor
     {
-        private readonly ILibraryCatalogoueDataAccess _libraryCatalogoueDataAccess;
+        private readonly ILibraryCatalogueDataAccess _libraryCatalogueDataAccess;
         private readonly ILogger<LibraryCatalogueInteractor> _log;
 
-        public LibraryCatalogueInteractor(ILibraryCatalogoueDataAccess libraryCatalogoueDataAccess, ILogger<LibraryCatalogueInteractor> log)
+        public LibraryCatalogueInteractor(ILibraryCatalogueDataAccess libraryCatalogueDataAccess, ILogger<LibraryCatalogueInteractor> log)
         {
-            this._libraryCatalogoueDataAccess = libraryCatalogoueDataAccess ?? throw new ArgumentNullException(nameof(libraryCatalogoueDataAccess));
-            this._log = log ?? throw new ArgumentNullException(nameof(log));
+            _libraryCatalogueDataAccess = libraryCatalogueDataAccess ?? throw new ArgumentNullException(nameof(libraryCatalogueDataAccess));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         public async Task<BookState> AddBook(string isbn, Guid libraryID, Guid userID)
         {
             _log.LogInformation("[{Class}.{Method}] Saving state for book '{isbn}', libraryID '{libraryID}'.", nameof(LibraryCatalogueInteractor), nameof(AddBook), isbn, libraryID);
-
-            if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
-            if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
-            if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
-            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
+            VerifyInput(isbn, libraryID, userID);
 
             BookState bookState = new(isbn, State.In, libraryID)
             {
@@ -35,38 +31,40 @@ namespace LibraryCop.BusinessLogic
                 CreatedBy = userID
             };
 
-            await _libraryCatalogoueDataAccess.SaveBookState(bookState);
+            await _libraryCatalogueDataAccess.SaveBookState(bookState);
 
             return bookState;
+        }
+
+        private static void VerifyInput(string isbn, Guid libraryID, Guid userID)
+        {
+            if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
+            if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
+            if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
+            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
         }
 
         public async Task<BookState> BorrowBook(string isbn, Guid libraryID, Guid userID)
         {
             _log.LogInformation("[{Class}.{Method}] Saving state for book '{isbn}', libraryID '{libraryID}'.", nameof(LibraryCatalogueInteractor), nameof(BorrowBook), isbn, libraryID);
+            VerifyInput(isbn, libraryID, userID);
 
-            if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
-            if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
-            if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
-            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
-
-            BookState? bookState = await _libraryCatalogoueDataAccess.GetState(isbn, libraryID);
-
-            bookState ??= new(isbn, State.In, libraryID)
-                {
-                    Created = DateTime.Now,
-                    CreatedBy = userID
-                };
+            BookState? bookState = await _libraryCatalogueDataAccess.GetState(isbn, libraryID) ?? new(isbn, State.In, libraryID)
+            {
+                Created = DateTime.Now,
+                CreatedBy = userID
+            };
 
             bookState.State = (bookState.State == State.In) ? State.OnLoan : State.In;
             bookState.Changed = DateTime.Now;
             bookState.ChangedBy = userID;
 
-            await _libraryCatalogoueDataAccess.SaveBookState(bookState);
+            await _libraryCatalogueDataAccess.SaveBookState(bookState);
 
             return bookState;
         }
 
-        internal static bool VerifyISBN(string isbn)
+        private static bool VerifyISBN(string isbn)
         {
             if (isbn.Length == 10)
                 return VerifyISBN10(isbn);
@@ -75,7 +73,7 @@ namespace LibraryCop.BusinessLogic
             else return false;
         }
 
-        internal static bool VerifyISBN10(string isbn)
+        private static bool VerifyISBN10(string isbn)
         {
             // Remove any non-numeric characters from the ISBN
             isbn = new string(isbn.Where(char.IsDigit).ToArray());
@@ -100,7 +98,7 @@ namespace LibraryCop.BusinessLogic
             }
         }
 
-        internal static bool VerifyISBN13(string isbn)
+        private static bool VerifyISBN13(string isbn)
         {
             // Remove any non-numeric characters from the ISBN
             isbn = new string(isbn.Where(char.IsDigit).ToArray());
@@ -119,7 +117,7 @@ namespace LibraryCop.BusinessLogic
         }
 
         public async Task<BookState> GetBookState(string isbn, Guid libraryID) {
-            var state = await _libraryCatalogoueDataAccess.GetState(isbn, libraryID);
+            var state = await _libraryCatalogueDataAccess.GetState(isbn, libraryID);
 
             state ??= new BookState(isbn, State.NotOwned, libraryID);
 

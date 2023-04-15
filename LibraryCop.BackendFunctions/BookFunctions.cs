@@ -47,13 +47,5 @@ namespace LibraryCop.BackendFunctions
 
             return new OkObjectResult(book);
         }
-
-        [FunctionName("bookActions")]
-        public async Task<IActionResult> RunActions([HttpTrigger(AuthorizationLevel.Function, "get", Route ="books/{isbn:long}/actions")] HttpRequest req, long isbn, ILogger log)
-        {
-            log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(BookFunctions), nameof(RunActions));
-
-            return new NotFoundResult();
-        }
     }
 }

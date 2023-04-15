@@ -58,7 +58,7 @@ namespace LibraryCop.BackendFunctions
             services.AddSingleton<IBookManagementDataAccess, BookTableDataAccess>();
             services.AddSingleton<BookFinderInteractor>();
 
-            services.AddSingleton<ILibraryCatalogoueDataAccess, LibraryCatalogueTableDataAccess>();
+            services.AddSingleton<ILibraryCatalogueDataAccess, LibraryCatalogueTableDataAccess>();
             services.AddSingleton<LibraryCatalogueInteractor>();
         }
     }

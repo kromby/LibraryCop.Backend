@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibraryCop.BusinessLogic.DataAccess
 {
-    public class LibraryCatalogueTableDataAccess : ILibraryCatalogoueDataAccess
+    public class LibraryCatalogueTableDataAccess : ILibraryCatalogueDataAccess
     {
         private readonly TableClient _tableClient;
         private readonly ILogger<LibraryCatalogueTableDataAccess> _log;
