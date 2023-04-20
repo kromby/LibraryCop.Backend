@@ -31,7 +31,7 @@ namespace BackendFunctions
             var authorizationHeader = headers[AUTHORIZATION_HEADER_NAME].ToString().Split(" ");
 
             user = authenticationInteractor.GetUserFromToken(authorizationHeader[0], authorizationHeader[1]);
-            return true;
+            return user != null;
         }
     }
 }

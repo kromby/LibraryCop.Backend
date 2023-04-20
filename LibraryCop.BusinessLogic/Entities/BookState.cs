@@ -36,8 +36,8 @@ namespace LibraryCop.BusinessLogic.Entities
         public Guid? ChangedBy { get; set; }
         public DateTime? Changed { get; set; }
 
-        public DateTime LastChanged { get { return Changed.HasValue ? Changed.Value : Created; } }
-        public Guid LastChangedBy { get { return ChangedBy.HasValue ? ChangedBy.Value : CreatedBy; } }
+        public DateTime LastChanged { get { return Changed ?? Created; } }
+        public Guid LastChangedBy { get { return ChangedBy ?? CreatedBy; } }
     }
 
     public enum State

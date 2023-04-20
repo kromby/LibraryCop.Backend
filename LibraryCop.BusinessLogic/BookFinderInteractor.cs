@@ -6,6 +6,8 @@ namespace LibraryCop.BusinessLogic
 {
     public class BookFinderInteractor
     {
+        private const int DEFAULT_DATAACCESS_PRIORITY = 1;
+
         private readonly IList<IBookFinderDataAccess> _bookFinderDataAccesses;
         private readonly IBookManagementDataAccess _bookManagementDataAccess;
         private readonly ILogger<BookFinderInteractor> _log;
@@ -16,45 +18,96 @@ namespace LibraryCop.BusinessLogic
             if (bookFinderDataAccesses == null || bookFinderDataAccesses.Count == 0)
                 throw new ArgumentNullException(nameof(bookFinderDataAccesses), "Can not be null or empty.");
             _bookFinderDataAccesses = bookFinderDataAccesses;
-            _bookManagementDataAccess = bookManagementDataAccess;
-            _libraryCatalogueInteractor = libraryCatalogueInteractor;
+            _bookManagementDataAccess = bookManagementDataAccess ?? throw new ArgumentNullException(nameof(bookManagementDataAccess), "Can not be null.");
+            _libraryCatalogueInteractor = libraryCatalogueInteractor ?? throw new ArgumentNullException(nameof(libraryCatalogueInteractor), "Can not be null.");
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
         public async Task<Book?> GetBook(string isbn, Guid libraryID)
         {
-            _log.LogInformation("[{Method}] Looking for book '{isbn}'.", nameof(GetBook), isbn);
+            _log.LogInformation("[{Class}.{Method}] Looking for book '{isbn}'.", nameof(BookFinderInteractor), nameof(GetBook), isbn);
 
             Book? book = null;
 
             foreach (var bookFinder in _bookFinderDataAccesses.OrderBy(t => t.Priority))
             {
-                book = await bookFinder.GetBook(isbn);
-
-                if (book != null)
+                try
                 {
-                    if (book.Saved)
+                    book = await bookFinder.GetBook(isbn);
+
+                    if (book != null)
                     {
-                        var stateTask = GetState(isbn, libraryID);
-                        var labelsTask = GetLabels(/*isbn*/);
+                        if (book.Saved)
+                        {
+                            var stateTask = GetState(isbn, libraryID);
+                            var labelsTask = GetLabels(/*isbn*/);
 
-                        stateTask.Wait();
-                        book.State = stateTask.Result;
-                        //labelsTask.Wait();
-                        book.Labels = labelsTask; //.Result;
+                            book.State = await stateTask;
+                            //labelsTask.Wait();
+                            book.Labels = labelsTask; //.Result;
+                        }
+                        else
+                        {
+                            await _bookManagementDataAccess.SaveBook(book);
+                        }
+
+                        book.Operations = GetOperations(isbn, book.State.State);
+
+                        break;
                     }
-                    else
-                    {
-                        await _bookManagementDataAccess.SaveBook(book);
-                    }
-
-                    book.Operations = GetOperations(isbn, book.State.State);
-
-                    break;
+                }
+                catch (Exception ex)
+                {
+                    _log.LogError(ex, "[{Class}.{Method}] Exception looking for book '{isbn}'.", nameof(BookFinderInteractor), nameof(GetBook), isbn);
+                    continue;
                 }
             }
 
             return book;
+        }
+
+        public async Task<IList<Book>> GetBooksByTitle(string title, Guid libraryID)
+        {
+            _log.LogInformation("[{Class}.{Method}] Looking for book by name '{isbn}'.", nameof(BookFinderInteractor), nameof(GetBooksByTitle), title);
+
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentNullException(nameof(title));
+
+            try
+            {
+                var bookFinder = _bookFinderDataAccesses.Where(t => t.Priority == DEFAULT_DATAACCESS_PRIORITY).First();
+                var list = await bookFinder.GetBooksByTitle(title);
+
+                foreach (var book in list)
+                {
+
+                    try
+                    {
+                        var stateTask = GetState(book.ISBN, libraryID);
+                        var labelsTask = GetLabels(/*isbn*/);
+
+                        book.State = await stateTask;
+                        //labelsTask.Wait();
+                        book.Labels = labelsTask; //.Result;
+
+                        book.Operations = GetOperations(book.ISBN, book.State.State);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (book != null && !string.IsNullOrEmpty(book.ISBN))
+                            _log.LogError(ex, "[{Class}.{Method}] Exception looking for book '{name}' with ISBN '{isbn}'.", nameof(BookFinderInteractor), nameof(GetBook), title, book.ISBN);
+                        else
+                            _log.LogError(ex, "[{Class}.{Method}] Exception looking for book '{name}' - book object is empty.", nameof(BookFinderInteractor), nameof(GetBook), title);
+                        continue;
+                    }
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "[{Class}.{Method}] Exception looking for book '{name}'.", nameof(BookFinderInteractor), nameof(GetBook), title);
+                return new List<Book>();
+            }
         }
 
         public static IList<BookOperation> GetOperations(string isbn, State state)
@@ -65,10 +118,10 @@ namespace LibraryCop.BusinessLogic
             {
                 list.Add(new BookOperation() { ID = 1, Name = "Skrá bók", Description = "Bæta við í bókasafn skólans", Method = HttpMethod.Post.ToString(), Path = $"/libraries/books/{isbn}" });
                 //list.Add(new BookOperation() { ID = 4, Name = "Óskalisti", Description = "Setja á óskalistann", Path = $"/books/{isbn}/" });
-            }            
-            else if(state.Equals(State.In))
+            }
+            else if (state.Equals(State.In))
             {
-                list.Add(new BookOperation() { ID = 2, Name = "Taka út", Description = "Fá bók lánaða", Method = HttpMethod.Put.ToString(), Path = $"/libraries/books/{isbn}" });                
+                list.Add(new BookOperation() { ID = 2, Name = "Taka út", Description = "Fá bók lánaða", Method = HttpMethod.Put.ToString(), Path = $"/libraries/books/{isbn}" });
             }
             else if (state.Equals(State.OnLoan))
             {
@@ -82,7 +135,7 @@ namespace LibraryCop.BusinessLogic
         {
             var state = await _libraryCatalogueInteractor.GetBookState(isbn, libraryID);
 
-            if(state != null) { return state; }
+            if (state != null) { return state; }
             return new BookState(isbn, State.NotOwned, libraryID);
         }
 

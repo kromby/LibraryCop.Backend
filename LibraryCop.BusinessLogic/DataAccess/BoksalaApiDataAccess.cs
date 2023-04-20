@@ -101,5 +101,10 @@ namespace LibraryCop.BusinessLogic.DataAccess
                 return null;
             }
         }
+
+        public Task<IList<Book>> GetBooksByTitle(string title)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

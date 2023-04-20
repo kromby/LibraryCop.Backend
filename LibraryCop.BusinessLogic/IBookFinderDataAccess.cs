@@ -20,5 +20,12 @@ namespace LibraryCop.BusinessLogic
         /// <param name="isbn">The International Standard Book Number.</param>
         /// <returns>Information about a book.</returns>
         public Task<Book?> GetBook(string isbn);
+
+        /// <summary>
+        /// Retrieves a list books that include the input in their title.
+        /// </summary>
+        /// <param name="title">Title or part of a title for a book.</param>
+        /// <returns>A list of books.</returns>
+        public Task<IList<Book>> GetBooksByTitle(string title);
     }
 }
