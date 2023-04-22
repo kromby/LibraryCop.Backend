@@ -133,10 +133,7 @@ namespace LibraryCop.BusinessLogic
 
         public async Task<BookState> GetState(string isbn, Guid libraryID)
         {
-            var state = await _libraryCatalogueInteractor.GetBookState(isbn, libraryID);
-
-            if (state != null) { return state; }
-            return new BookState(isbn, State.NotOwned, libraryID);
+            return await _libraryCatalogueInteractor.GetBookState(isbn, libraryID);
         }
 
         public static IList<string> GetLabels(/*string isbn*/)

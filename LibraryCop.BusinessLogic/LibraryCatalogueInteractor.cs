@@ -119,7 +119,7 @@ namespace LibraryCop.BusinessLogic
         public async Task<BookState> GetBookState(string isbn, Guid libraryID) {
             var state = await _libraryCatalogueDataAccess.GetState(isbn, libraryID);
 
-            state ??= new BookState(isbn, State.NotOwned, libraryID);
+            state ??= new BookState(isbn, State.NotOwned, libraryID) { Created = DateTime.Now, CreatedBy = libraryID};
 
             return state;
         }
