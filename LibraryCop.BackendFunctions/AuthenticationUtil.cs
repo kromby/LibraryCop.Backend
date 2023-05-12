@@ -18,7 +18,7 @@ namespace BackendFunctions
     {
         private const string AUTHORIZATION_HEADER_NAME = "X-Custom-Authorization";
 
-        public static bool GetAuthenticatedUser(AuthenticationInteractor authenticationInteractor, IHeaderDictionary headers, out AuthenticatedUser user, ILogger log)
+        public static bool GetAuthenticatedUser(AuthenticationInteractor authenticationInteractor, IHeaderDictionary headers, out User user, ILogger log)
         {
             log.LogInformation("[{Class}.{Method}] AUTHORIZATION_HEADER_NAME: '{AUTHORIZATION_HEADER_NAME}'", nameof(AuthenticationUtil), nameof(GetAuthenticatedUser), AUTHORIZATION_HEADER_NAME);
             if (!headers.ContainsKey(AUTHORIZATION_HEADER_NAME))

@@ -32,7 +32,7 @@ namespace BackendFunctions
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(LibraryCatalogueFunctions), nameof(RunLibraryBooks));
 
-            if(!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out AuthenticatedUser user, log))
+            if(!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out User user, log))
             {
                 return new UnauthorizedResult();
             }

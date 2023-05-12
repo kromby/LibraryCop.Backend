@@ -15,7 +15,6 @@ namespace BusinessLogic.DataAccess.Model
             PartitionKey = string.Empty;
             RowKey = string.Empty;
             Name = string.Empty;
-            Created = DateTime.Now;
         }
 
         public string PartitionKey { get; set; }

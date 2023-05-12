@@ -43,12 +43,11 @@ namespace BackendFunctions
 
             if(body == null)
             {
-                log.LogInformation("[{{Class}}.{{Method}}] Body is invalid.", nameof(AuthenticateFunctions), nameof(RunAuthenticate));
+                log.LogInformation("[{Class}.{Method}] Body is invalid.", nameof(AuthenticateFunctions), nameof(RunAuthenticate));
                 return new BadRequestResult();
             }
 
-            //log.LogInformation($"[RunAuthenticate] Request username: {body.Username}");
-            log.LogInformation("[{{Class}}.{{Method}}] Request IP Address: {IP}", nameof(AuthenticateFunctions), nameof(RunAuthenticate), req.HttpContext.Connection.RemoteIpAddress.MapToIPv4());
+            log.LogInformation("[{Class}.{Method}] Request IP Address: {IP}", nameof(AuthenticateFunctions), nameof(RunAuthenticate), req.HttpContext.Connection.RemoteIpAddress.MapToIPv4());
 
             try
             {
@@ -63,7 +62,7 @@ namespace BackendFunctions
             catch (UnauthorizedAccessException uaex)
             {
                 log.LogError(uaex, "[{Class}.{Method}] Unauthorized", nameof(AuthenticateFunctions), nameof(RunAuthenticate));
-                return new UnauthorizedResult();
+                return new UnauthorizedObjectResult(uaex.Message);
             }
             catch (Exception ex)
             {

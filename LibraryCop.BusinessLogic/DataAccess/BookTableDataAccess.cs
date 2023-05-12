@@ -17,10 +17,10 @@ namespace LibraryCop.BusinessLogic.DataAccess
         private readonly TableClient _tableClient;
         private readonly ILogger<BookTableDataAccess> _log;
 
-        public BookTableDataAccess(TableClient tableClient, ILogger<BookTableDataAccess> log)
+        public BookTableDataAccess(ConnectionInfo connectionInfo, ILogger<BookTableDataAccess> log)
         {
             Priority = 1;
-            _tableClient = tableClient;
+            _tableClient = new TableClient(connectionInfo.ConnectionString, "Book");
             _log = log;
         }
 

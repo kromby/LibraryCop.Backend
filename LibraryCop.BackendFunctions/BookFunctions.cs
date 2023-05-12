@@ -32,7 +32,7 @@ namespace LibraryCop.BackendFunctions
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(BookFunctions), nameof(RunBooks));
 
-            if (!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out AuthenticatedUser user, log))
+            if (!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out User user, log))
             {
                 return new UnauthorizedResult();
             }
@@ -56,7 +56,7 @@ namespace LibraryCop.BackendFunctions
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(BookFunctions), nameof(RunBooksIsbn));
 
-            if (!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out AuthenticatedUser user, log))
+            if (!AuthenticationUtil.GetAuthenticatedUser(_authenticationInteractor, req.Headers, out User user, log))
             {
                 return new UnauthorizedResult();
             }

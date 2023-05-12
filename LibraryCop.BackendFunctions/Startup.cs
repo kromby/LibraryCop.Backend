@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using BusinessLogic;
+using BusinessLogic.DataAccess;
 using BusinessLogic.Entities;
 using LibraryCop.BackendFunctions;
 using LibraryCop.BusinessLogic;
@@ -44,20 +45,22 @@ namespace LibraryCop.BackendFunctions
                 options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
             });
 
+            // Connection info           
+            services.AddSingleton(new ConnectionInfo(connectionString));
+
             // Authentication
             services.AddSingleton(new AuthenticationInfo(key, issuer, audience, salt));
-
-            services.AddSingleton(new TableClient(connectionString, "Book"));
-            services.AddSingleton<ConnectionInfo>(new ConnectionInfo(connectionString));
-
             services.AddSingleton<AuthenticationInteractor>();
+            services.AddSingleton<IUserDataAccess, UserTableDataAccess>();
 
+            // Book
             services.AddSingleton<IBookFinderDataAccess, BookTableDataAccess>();
             services.AddSingleton<IBookFinderDataAccess, LeitirApiDataAccess>();
             services.AddSingleton<IBookFinderDataAccess, BoksalaApiDataAccess>();
             services.AddSingleton<IBookManagementDataAccess, BookTableDataAccess>();
             services.AddSingleton<BookFinderInteractor>();
 
+            // Library
             services.AddSingleton<ILibraryCatalogueDataAccess, LibraryCatalogueTableDataAccess>();
             services.AddSingleton<LibraryCatalogueInteractor>();
         }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace LibraryCop.BusinessLogic.Entities
 {
     /// <summary>
-    /// Information stored in JWT.
+    /// User information stored in JWT.
     /// </summary>
-    public class AuthenticatedUser
+    public class User
     {
         /// <summary>
         /// Initializes a new instance of the LibraryCop.BusinessLogic.Entities.AuthenticatedUser using the specified
@@ -18,11 +18,12 @@ namespace LibraryCop.BusinessLogic.Entities
         /// <param name="userID">Unique identifier for an user.</param>
         /// <param name="libraryID">Unique identifier for the library that an user is associated to.</param>
         /// <param name="name">Name of user.</param>
-        public AuthenticatedUser(Guid userID, Guid libraryID, string name)
+        public User(Guid userID, Guid libraryID, string name)
         {
             UserID = userID;
             LibraryID = libraryID;
             Name = name;
+            Password = string.Empty;
         }
 
         /// <summary>
@@ -39,5 +40,7 @@ namespace LibraryCop.BusinessLogic.Entities
         /// Name of user.
         /// </summary>
         public string Name { get; set; }
+
+        internal string Password { get; set; }
     }
 }
