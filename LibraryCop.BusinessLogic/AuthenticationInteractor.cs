@@ -98,20 +98,7 @@ namespace LibraryCop.BusinessLogic
                 throw new UnauthorizedAccessException("Username and/or password incorrect.");
             }
 
-            //var userID = Guid.NewGuid();
-
-            //if (userID <= 0)
-            //{
-            //    _log.LogWarning($"[{nameof(AuthenticationInteractor)}] User '{username}' not authenticated.");
-            //    throw new UnauthorizedAccessException();
-            //}
-
-            //var loginTask = _authenticationDataAccess.SaveLoginInformation(userID, ipAddress);
-
-            //OLD LIBRARY ID: Guid.Parse("79dee872-a4e8-4d94-8c9d-4bdcfb0bc639")
             var jwt = GetToken(user.UserID, user.LibraryID, user.Name);
-
-            //loginTask.Wait();
 
             return jwt;
         }
