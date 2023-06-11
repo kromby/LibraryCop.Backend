@@ -82,9 +82,9 @@ namespace LibraryCop.BusinessLogic
                 throw new ArgumentNullException(nameof(password));
             }
 
-            string hashed = HashPassword(password, Encoding.UTF32.GetBytes(_authenticationInfo.Salt));
+            string hashed = HashPassword(password.Trim(), Encoding.UTF32.GetBytes(_authenticationInfo.Salt));
 
-            var user = await _userDataAccess.GetUser(username);
+            var user = await _userDataAccess.GetUser(username.Trim());
 
             if(user == null)
             {
@@ -124,7 +124,7 @@ namespace LibraryCop.BusinessLogic
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationInfo.Key));
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
-            var token = new JwtSecurityToken(_authenticationInfo.Issuer, _authenticationInfo.Audience, claims, expires: DateTime.Now.AddMinutes(240), signingCredentials: creds);
+            var token = new JwtSecurityToken(_authenticationInfo.Issuer, _authenticationInfo.Audience, claims, expires: DateTime.Now.AddMinutes(7*24*60), signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

@@ -48,6 +48,8 @@ namespace LibraryCop.BusinessLogic
                         }
                         else
                         {
+                            book.State.Created = DateTime.Now;
+                            book.State.CreatedBy = libraryID;
                             await _bookManagementDataAccess.SaveBook(book);
                         }
 
@@ -62,6 +64,9 @@ namespace LibraryCop.BusinessLogic
                     continue;
                 }
             }
+
+            if (book == null)
+                _log.LogWarning("[{class}.{method}] Book {isbn} not found.", nameof(BookFinderInteractor), nameof(GetBook), isbn);
 
             return book;
         }
