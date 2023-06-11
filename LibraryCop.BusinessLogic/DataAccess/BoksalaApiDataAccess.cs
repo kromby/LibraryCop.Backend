@@ -48,6 +48,21 @@ namespace LibraryCop.BusinessLogic.DataAccess
             return Parse(result, isbn);
         }
 
+        public async Task<Book> GetBook(string isbn, Book partialBook)
+        {
+            var tempBook = await GetBook(isbn);
+
+            if (tempBook != null)
+            {
+                partialBook.Detail.ImageUrl = tempBook.Detail.ImageUrl;
+                partialBook.Detail.Link = tempBook.Detail.Link;
+            }
+
+            partialBook.IsComplete = true;
+            partialBook.Saved = false;
+            return partialBook;
+        }
+
         private Book? Parse(string json, string isbn)
         {
             try
@@ -105,6 +120,6 @@ namespace LibraryCop.BusinessLogic.DataAccess
         public Task<IList<Book>> GetBooksByTitle(string title)
         {
             throw new NotImplementedException();
-        }
+        }        
     }
 }

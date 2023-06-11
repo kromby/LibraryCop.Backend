@@ -18,11 +18,14 @@ namespace LibraryCop.BusinessLogic.Entities
             State = new(isbn, Entities.State.NotOwned, Guid.Empty);
             Operations = new List<BookOperation>();
             Labels = new List<string>();
+
+            IsComplete = false;
         }
 
         internal bool Saved { get; set; }
         public string ISBN { get; set; }
         public string Publisher { get; set; }
+        public bool IsComplete { get; set; }
         public BookDetail Detail { get; set; }
         public BookState State { get; set; }
 

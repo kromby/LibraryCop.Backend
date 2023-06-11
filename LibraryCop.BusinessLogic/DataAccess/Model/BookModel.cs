@@ -29,6 +29,7 @@ namespace BusinessLogic.DataAccess.Model
             Link = book.Detail.Link;
             Format = book.Detail.Format;
             PublishYear = book.Detail.PublishYear;
+            IsComplete = book.IsComplete;
         }
 
         public string PartitionKey { get; set; }
@@ -43,5 +44,6 @@ namespace BusinessLogic.DataAccess.Model
         public string? Link { get; set; }
         public string? Format { get; set; }
         public int? PublishYear { get; set; }
+        public bool IsComplete { get; set; }
     }
 }

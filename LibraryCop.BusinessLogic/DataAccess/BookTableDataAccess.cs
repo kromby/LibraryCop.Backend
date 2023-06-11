@@ -42,6 +42,10 @@ namespace LibraryCop.BusinessLogic.DataAccess
             return null;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<Book> GetBook(string isbn, Book partialBook) => partialBook;
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
         public async Task<IList<Book>> GetBooksByTitle(string title)
         {
             _log.LogInformation("[{Class}.{Method}] Looking for book by title '{name}'.", nameof(BookTableDataAccess), nameof(GetBooksByTitle), title);
@@ -80,7 +84,8 @@ namespace LibraryCop.BusinessLogic.DataAccess
                     Created = bookEntity.Timestamp.HasValue ? bookEntity.Timestamp.Value.LocalDateTime : DateTime.Today,
                     Format = bookEntity.Format,
                     PublishYear = bookEntity.PublishYear
-                }
+                },
+                IsComplete = bookEntity.IsComplete
             };
         }
 
@@ -88,6 +93,6 @@ namespace LibraryCop.BusinessLogic.DataAccess
         {
             var entity = new BookModel(book);
             await _tableClient.UpsertEntityAsync<BookModel>(entity);
-        }
+        }        
     }
 }

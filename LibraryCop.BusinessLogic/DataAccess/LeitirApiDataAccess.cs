@@ -42,6 +42,10 @@ namespace LibraryCop.BusinessLogic.DataAccess
             return Parse(json, isbn);
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<Book> GetBook(string isbn, Book partialBook) => partialBook;
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
         private Book? Parse(string json, string isbn)
         {
             var result = JsonConvert.DeserializeObject<LeitirResult>(json);
@@ -94,6 +98,6 @@ namespace LibraryCop.BusinessLogic.DataAccess
         public Task<IList<Book>> GetBooksByTitle(string title)
         {
             throw new NotImplementedException();
-        }
+        }        
     }
 }

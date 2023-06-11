@@ -33,28 +33,40 @@ namespace LibraryCop.BusinessLogic
             {
                 try
                 {
-                    book = await bookFinder.GetBook(isbn);
-
-                    if (book != null)
+                    if (book == null)
+                        book = await bookFinder.GetBook(isbn);
+                    else
                     {
-                        if (book.Saved)
-                        {
-                            var stateTask = GetState(isbn, libraryID);
-                            var labelsTask = GetLabels(/*isbn*/);
+                        book = await bookFinder.GetBook(isbn, book);
 
-                            book.State = await stateTask;
-                            //labelsTask.Wait();
-                            book.Labels = labelsTask; //.Result;
-                        }
+                        if (string.IsNullOrWhiteSpace(book.Detail.ImageUrl))
+                            continue;
                         else
-                        {
-                            book.State.Created = DateTime.Now;
-                            book.State.CreatedBy = libraryID;
-                            await _bookManagementDataAccess.SaveBook(book);
-                        }
+                            break;
+                    }
 
-                        book.Operations = GetOperations(isbn, book.State.State);
+                    if (book == null)
+                        continue;
 
+                    if (book.Saved)
+                    {
+                        var stateTask = GetState(isbn, libraryID);
+                        var labelsTask = GetLabels(/*isbn*/);
+
+                        book.State = await stateTask;
+                        //labelsTask.Wait();
+                        book.Labels = labelsTask; //.Result;
+                    }
+                    else
+                    {
+                        book.State.Created = DateTime.Now;
+                        book.State.CreatedBy = libraryID;
+                    }
+
+                    book.Operations = GetOperations(isbn, book.State.State);
+
+                    if (book.IsComplete || !string.IsNullOrWhiteSpace(book.Detail.ImageUrl))
+                    {
                         break;
                     }
                 }
@@ -66,7 +78,13 @@ namespace LibraryCop.BusinessLogic
             }
 
             if (book == null)
+            {
                 _log.LogWarning("[{class}.{method}] Book {isbn} not found.", nameof(BookFinderInteractor), nameof(GetBook), isbn);
+            }
+            else if (!book.Saved)
+            {
+                await _bookManagementDataAccess.SaveBook(book);
+            }
 
             return book;
         }

@@ -22,6 +22,14 @@ namespace LibraryCop.BusinessLogic
         public Task<Book?> GetBook(string isbn);
 
         /// <summary>
+        /// Retrieves information about a specific book.
+        /// </summary>
+        /// <param name="isbn">The International Standard Book Number.</param>
+        /// <param name="partialBook">A book that has been partially retrieved from another source.</param>
+        /// <returns>Information about a book.</returns>
+        public Task<Book> GetBook(string isbn, Book partialBook);
+
+        /// <summary>
         /// Retrieves a list books that include the input in their title.
         /// </summary>
         /// <param name="title">Title or part of a title for a book.</param>
