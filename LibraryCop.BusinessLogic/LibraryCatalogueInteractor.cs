@@ -1,4 +1,5 @@
-﻿using LibraryCop.BusinessLogic.DataAccess;
+﻿using BusinessLogic.Utils;
+using LibraryCop.BusinessLogic.DataAccess;
 using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
 using System;
@@ -41,7 +42,7 @@ namespace LibraryCop.BusinessLogic
             if (string.IsNullOrWhiteSpace(isbn)) throw new ArgumentNullException(nameof(isbn));
             if (libraryID == Guid.Empty) throw new ArgumentNullException(nameof(libraryID));
             if (userID == Guid.Empty) throw new ArgumentNullException(nameof(userID));
-            if (!VerifyISBN(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
+            if (!ISBNHelper.IsValid(isbn)) throw new ArgumentException("ISBN is invalid.", nameof(isbn));
         }
 
         public async Task<BookState> BorrowBook(string isbn, Guid libraryID, Guid userID)
@@ -62,58 +63,6 @@ namespace LibraryCop.BusinessLogic
             await _libraryCatalogueDataAccess.SaveBookState(bookState);
 
             return bookState;
-        }
-
-        private static bool VerifyISBN(string isbn)
-        {
-            if (isbn.Length == 10)
-                return VerifyISBN10(isbn);
-            else if (isbn.Length == 13)
-                return VerifyISBN13(isbn);
-            else return false;
-        }
-
-        private static bool VerifyISBN10(string isbn)
-        {
-            // Remove any non-numeric characters from the ISBN
-            isbn = new string(isbn.Where(char.IsDigit).ToArray());
-
-            // Calculate the check digit
-            int sum = 0;
-            for (int i = 0; i < 9; i++)
-            {
-                int digit = isbn[i] - '0';
-                sum += (i + 1) * digit;
-            }
-            int checkDigit = sum % 11;
-
-            // Compare the calculated check digit to the actual check digit
-            if (checkDigit == 10)
-            {
-                return (isbn[9] == 'X');
-            }
-            else
-            {
-                return (isbn[9] - '0') == checkDigit;
-            }
-        }
-
-        private static bool VerifyISBN13(string isbn)
-        {
-            // Remove any non-numeric characters from the ISBN
-            isbn = new string(isbn.Where(char.IsDigit).ToArray());
-
-            // Calculate the check digit
-            int sum = 0;
-            for (int i = 0; i < 12; i++)
-            {
-                int digit = isbn[i] - '0';
-                sum += (i % 2 == 0) ? digit : 3 * digit;
-            }
-            int checkDigit = (10 - (sum % 10)) % 10;
-
-            // Compare the calculated check digit to the actual check digit
-            return (isbn[12] - '0') == checkDigit;
         }
 
         public async Task<BookState> GetBookState(string isbn, Guid libraryID) {
