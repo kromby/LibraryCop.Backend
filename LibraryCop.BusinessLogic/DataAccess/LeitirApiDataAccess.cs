@@ -60,7 +60,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
             {
                 var docs = result.docs.First();
 
-                Book book = new(isbn, false)
+                Book book = new(isbn, false, Guid.NewGuid())
                 {                    
                     Publisher = docs.pnx.addata.pub.First() ?? docs.pnx.display.publisher.First(),               
                     Detail = new BookDetail()

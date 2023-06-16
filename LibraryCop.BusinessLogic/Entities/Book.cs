@@ -8,7 +8,7 @@ namespace LibraryCop.BusinessLogic.Entities
 {
     public class Book
     {
-        public Book(string isbn, bool saved)
+        public Book(string isbn, bool saved, Guid createdBy)
         {
             ISBN = isbn;
             Saved = saved;
@@ -20,12 +20,14 @@ namespace LibraryCop.BusinessLogic.Entities
             Labels = new List<string>();
 
             IsComplete = false;
+            CreatedBy = createdBy;
         }
 
         internal bool Saved { get; set; }
         public string ISBN { get; set; }
         public string Publisher { get; set; }
         public bool IsComplete { get; set; }
+        public Guid CreatedBy { get; set; }
         public BookDetail Detail { get; set; }
         public BookState State { get; set; }
 

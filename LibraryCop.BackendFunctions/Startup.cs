@@ -58,6 +58,7 @@ namespace LibraryCop.BackendFunctions
             services.AddSingleton<IBookFinderDataAccess, LeitirApiDataAccess>();
             services.AddSingleton<IBookFinderDataAccess, BoksalaApiDataAccess>();
             services.AddSingleton<IBookManagementDataAccess, BookTableDataAccess>();
+            services.AddSingleton<BookManagementInteractor>();
             services.AddSingleton<BookFinderInteractor>();
 
             // Library

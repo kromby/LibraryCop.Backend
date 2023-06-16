@@ -76,7 +76,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
 
                 var hit = result.hits.hits.First();
 
-                Book book = new(isbn, false)
+                Book book = new(isbn, false, Guid.NewGuid())
                 {                    
                     Publisher = hit._source.publisher,
                     Detail = new BookDetail()

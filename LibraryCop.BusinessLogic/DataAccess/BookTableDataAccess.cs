@@ -71,7 +71,7 @@ namespace LibraryCop.BusinessLogic.DataAccess
 
         private static Book ParseBookFromModel(BookModel bookEntity)
         {
-            return new Book(bookEntity.RowKey, true)
+            return new Book(bookEntity.RowKey, true, bookEntity.CreatedBy)
             {
                 Publisher = bookEntity.PartitionKey,
                 Detail = new BookDetail()

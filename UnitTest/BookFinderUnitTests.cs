@@ -30,7 +30,8 @@ namespace UnitTest
         public async void GetBookHappyTest()
         {
             // ARRANGE
-            Book book = new("547946546", false);
+            User user = new(Guid.NewGuid(), Guid.NewGuid(), "user");
+            Book book = new("547946546", false, user.UserID);
             Guid libraryID = Guid.NewGuid();
             _bookFinderDaNotFoundMock.Setup(f => f.GetBook(It.IsAny<string>()));
             _bookFinderDaNotFoundMock.Setup(f => f.Priority).Returns(1);
@@ -46,7 +47,7 @@ namespace UnitTest
             BookFinderInteractor interactor = new(list, _bookManagementDaMock.Object, _libraryCatalogueInteractorMock.Object, _interactorLog.Object);            
 
             // ACT
-            var result = await interactor.GetBook(book.ISBN, libraryID);
+            var result = await interactor.GetBook(book.ISBN, user);
 
             // ASSERT
             Assert.NotNull(result);

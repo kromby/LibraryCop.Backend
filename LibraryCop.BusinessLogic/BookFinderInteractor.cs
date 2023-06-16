@@ -23,7 +23,7 @@ namespace LibraryCop.BusinessLogic
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
-        public async Task<Book?> GetBook(string isbn, Guid libraryID)
+        public async Task<Book?> GetBook(string isbn, User user)
         {
             _log.LogInformation("[{Class}.{Method}] Looking for book '{isbn}'.", nameof(BookFinderInteractor), nameof(GetBook), isbn);
 
@@ -50,7 +50,7 @@ namespace LibraryCop.BusinessLogic
 
                     if (book.Saved)
                     {
-                        var stateTask = GetState(isbn, libraryID);
+                        var stateTask = GetState(isbn, user.LibraryID);
                         var labelsTask = GetLabels(/*isbn*/);
 
                         book.State = await stateTask;
@@ -59,8 +59,9 @@ namespace LibraryCop.BusinessLogic
                     }
                     else
                     {
+                        book.CreatedBy = user.UserID;
                         book.State.Created = DateTime.Now;
-                        book.State.CreatedBy = libraryID;
+                        book.State.CreatedBy = user.LibraryID;
                     }
 
                     book.Operations = GetOperations(isbn, book.State.State);

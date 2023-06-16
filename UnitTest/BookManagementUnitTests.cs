@@ -27,12 +27,13 @@ namespace UnitTest
         public async void SaveBookOkTest()
         {
             // ARRANGE
+            User user = new(Guid.NewGuid(), Guid.NewGuid(), "Test");
             string publisher = "Publisher";
             _bookMgmtDataAccess.Setup(x => x.SaveBook(It.Is<Book>(b => b.Publisher == publisher))).Verifiable();
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT
-            await interactor.SaveBook("Title", "Author", publisher, 1900);
+            await interactor.SaveBook("Title", "Author", publisher, 1900, user);
 
             // ASSERT
             _bookMgmtDataAccess.Verify();
@@ -46,10 +47,11 @@ namespace UnitTest
         public void SaveBookArgumentNullExceptionTest(string title, string author, string publisher)
         {
             // ARRANGE
+            User user = new(Guid.NewGuid(), Guid.NewGuid(), "Test");
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT & ASSERT
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await interactor.SaveBook(title, author, publisher, 0));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await interactor.SaveBook(title, author, publisher, 0, user));
         }
 
         [Theory]
@@ -60,10 +62,11 @@ namespace UnitTest
         public void SaveBookArgumentExceptionTest(int year)
         {
             // ARRANGE
+            User user = new(Guid.NewGuid(), Guid.NewGuid(), "Test");
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT & ASSERT
-            Assert.ThrowsAsync<ArgumentException>(async () => await interactor.SaveBook("Tit", "Aut", "Pub", year));
+            Assert.ThrowsAsync<ArgumentException>(async () => await interactor.SaveBook("Tit", "Aut", "Pub", year, user));
         }
     }
 }
