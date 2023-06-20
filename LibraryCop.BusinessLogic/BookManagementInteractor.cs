@@ -21,7 +21,7 @@ namespace BusinessLogic
             _log = log;
         }
 
-        public async Task SaveBook(string title, string author, string publisher, int publishYear, User user)
+        public async Task<string> SaveBook(string isbn, string title, string author, string publisher, int publishYear, User user)
         {
             _log.LogDebug("[{class}.{method}] Saving book '{title}'", nameof(BookManagementInteractor), nameof(SaveBook), title);
 
@@ -31,9 +31,10 @@ namespace BusinessLogic
             if (publishYear < 1900) throw new ArgumentException("Invalid year.", nameof(publishYear));
             if (publishYear > DateTime.Now.Year) throw new ArgumentException("Can not have a year in the future", nameof(publishYear));
 
-            var guid = Guid.NewGuid();
+            if (string.IsNullOrWhiteSpace(isbn))
+                isbn = Guid.NewGuid().ToString();
 
-            Book book = new(guid.ToString(), false, user.UserID)
+            Book book = new(isbn, false, user.UserID)
             {
                 IsComplete = true,
                 Publisher = publisher,                
@@ -45,7 +46,7 @@ namespace BusinessLogic
                 }
             };
 
-            await _bookManagementDataAccess.SaveBook(book);
+            return await _bookManagementDataAccess.SaveBook(book);
         }
     }
 }

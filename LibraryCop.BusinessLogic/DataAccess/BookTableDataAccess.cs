@@ -89,10 +89,18 @@ namespace LibraryCop.BusinessLogic.DataAccess
             };
         }
 
-        public async Task SaveBook(Book book)
+        public async Task<string> SaveBook(Book book)
         {
             var entity = new BookModel(book);
-            await _tableClient.UpsertEntityAsync<BookModel>(entity);
+            var response = await _tableClient.UpsertEntityAsync<BookModel>(entity);
+
+            if(response.IsError)
+            {
+                _log.LogError("[{Class}.{Method}] Can not save book '{isbn}', response: {response}", nameof(BookTableDataAccess), nameof(SaveBook), book.ISBN, response.ReasonPhrase);
+                throw new SystemException("Can not save book.");
+            }
+
+            return book.ISBN;
         }        
     }
 }

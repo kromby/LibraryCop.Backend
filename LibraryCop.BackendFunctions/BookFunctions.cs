@@ -62,7 +62,7 @@ namespace LibraryCop.BackendFunctions
             {
                 return new BadRequestObjectResult(aex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.LogError(ex, ex.Message);
                 throw;
@@ -76,15 +76,15 @@ namespace LibraryCop.BackendFunctions
 
         }
 
-        private async Task<IActionResult> PostBook(BookCreate book, User user)
+        private async Task<IActionResult> PostBook(BookCreate book, User user, string isbn = "")
         {
-            await _managementInteractor.SaveBook(book.Title, book.Author, book.Publisher, book.PublishYear, user);
-            return new CreatedResult("/api/books/", -1);
+            var result = await _managementInteractor.SaveBook(isbn, book.Title, book.Author, book.Publisher, book.PublishYear, user);
+            return new CreatedResult("/api/books/", result);
         }
 
         [FunctionName("booksIsbn")]
         public async Task<IActionResult> RunBooksIsbn(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "books/{isbn:long}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "books/{isbn:long}")] HttpRequest req,
            long isbn, ILogger log)
         {
             log.LogInformation("[{Class}.{Method}] C# HTTP trigger function processed a request.", nameof(BookFunctions), nameof(RunBooksIsbn));
@@ -96,14 +96,20 @@ namespace LibraryCop.BackendFunctions
 
             try
             {
-                var book = await _finderInteractor.GetBook(isbn.ToString(), user);
-
-                if (book == null)
+                if (req.Method == HttpMethods.Get)
                 {
-                    return new NotFoundResult();
+                    var book = await _finderInteractor.GetBook(isbn.ToString(), user);
+                    return book == null ? new NotFoundResult() : new OkObjectResult(book);
                 }
-
-                return new OkObjectResult(book);
+                else if (req.Method == HttpMethods.Post)
+                {
+                    var book = await req.ReadFromJsonAsync<BookCreate>();
+                    return await PostBook(book, user, isbn.ToString());
+                }
+                else
+                {
+                    return new NotFoundObjectResult($"Method '{req.Method}' not supported.");
+                }
             }
             catch (ArgumentException aex)
             {
