@@ -33,7 +33,7 @@ namespace UnitTest
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT
-            await interactor.SaveBook("Title", "Author", publisher, 1900, user);
+            await interactor.SaveBook("", "Title", "Author", publisher, 1900, user);
 
             // ASSERT
             _bookMgmtDataAccess.Verify();
@@ -51,7 +51,7 @@ namespace UnitTest
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT & ASSERT
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await interactor.SaveBook(title, author, publisher, 0, user));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await interactor.SaveBook("", title, author, publisher, 0, user));
         }
 
         [Theory]
@@ -66,7 +66,7 @@ namespace UnitTest
             BookManagementInteractor interactor = new(_bookMgmtDataAccess.Object, _interactorLog.Object);
 
             // ACT & ASSERT
-            Assert.ThrowsAsync<ArgumentException>(async () => await interactor.SaveBook("Tit", "Aut", "Pub", year, user));
+            Assert.ThrowsAsync<ArgumentException>(async () => await interactor.SaveBook("", "Tit", "Aut", "Pub", year, user));
         }
     }
 }

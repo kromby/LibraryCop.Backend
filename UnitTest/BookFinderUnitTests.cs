@@ -42,7 +42,7 @@ namespace UnitTest
                 _bookFinderDaNotFoundMock.Object,
                 _bookFinderDaMock.Object
             };
-            _bookManagementDaMock.Setup(m => m.SaveBook(book)).Returns(Task.Delay(100)).Verifiable();
+            _bookManagementDaMock.Setup(m => m.SaveBook(book)).Returns(Task<string>.FromResult(book.ISBN)).Verifiable();
 
             BookFinderInteractor interactor = new(list, _bookManagementDaMock.Object, _libraryCatalogueInteractorMock.Object, _interactorLog.Object);            
 
