@@ -32,7 +32,13 @@ namespace BusinessLogic
             if (publishYear > DateTime.Now.Year) throw new ArgumentException("Can not have a year in the future", nameof(publishYear));
 
             if (string.IsNullOrWhiteSpace(isbn))
-                isbn = Guid.NewGuid().ToString();
+                isbn = ISBNHelper.GenerateISBN();
+            else
+            {
+                if(!ISBNHelper.IsValid(isbn))
+                    throw new ArgumentException("ISBN is invalid.", nameof(isbn));
+            }
+                    
 
             Book book = new(isbn, false, user.UserID)
             {

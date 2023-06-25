@@ -59,5 +59,33 @@ namespace BusinessLogic.Utils
             // Compare the calculated check digit to the actual check digit
             return (isbn[12] - '0') == checkDigit;
         }
+
+        public static string GenerateISBN()
+        {
+            Random random = new();
+
+            // Generate first 12 digits
+            string isbn = string.Format("6{0}{1}", random.Next(10, 99), random.Next(100000000, 999999999));
+
+            // Calculate the checksum (13th digit)
+            int sum = 0;
+            int multiplier = 1;
+
+            for (int i = 0; i < 12; i++)
+            {
+                int digit = int.Parse(isbn[i].ToString());
+                sum += digit * multiplier;
+                multiplier = (multiplier == 1) ? 3 : 1;
+            }
+
+            int checksum = 10 - (sum % 10);
+
+            // If checksum is 10, set it to 0
+            checksum = (checksum == 10) ? 0 : checksum;
+
+            isbn += checksum;
+
+            return isbn;
+        }
     }
 }
