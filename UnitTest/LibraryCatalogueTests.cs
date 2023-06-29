@@ -14,11 +14,13 @@ namespace UnitTest
     public class LibraryCatalogueTests
     {
         private readonly Mock<ILibraryCatalogueDataAccess> _libraryCatalogueDaMock;
+        private readonly Mock<IUserDataAccess> _userDataAccessMock;
         private readonly Mock<ILogger<LibraryCatalogueInteractor>> _interactorLog;
 
         public LibraryCatalogueTests()
         {
             _libraryCatalogueDaMock = new Mock<ILibraryCatalogueDataAccess>(MockBehavior.Strict) { CallBase = true };
+            _userDataAccessMock = new Mock<IUserDataAccess> { CallBase = true };
             _interactorLog = new Mock<ILogger<LibraryCatalogueInteractor>>();
         }
 
@@ -29,7 +31,7 @@ namespace UnitTest
             
 
             // ACT
-            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _interactorLog.Object);
+            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _userDataAccessMock.Object, _interactorLog.Object);
 
             // ASSERT
             Assert.NotNull(interactor);
@@ -44,8 +46,8 @@ namespace UnitTest
 
 
             // ACT
-            Assert.Throws<ArgumentNullException>(() => new LibraryCatalogueInteractor(null, null));
-            Assert.Throws<ArgumentNullException>(() => new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new LibraryCatalogueInteractor(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _userDataAccessMock.Object, null));
 
             // ASSERT
 
@@ -59,7 +61,7 @@ namespace UnitTest
         {
             // ARRANGE
             _libraryCatalogueDaMock.Setup(l => l.SaveBookState(It.IsAny<BookState>())).Verifiable();
-            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _interactorLog.Object);
+            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _userDataAccessMock.Object, _interactorLog.Object);
 
             // ACT
             var entity = interactor.AddBook(isbn, Guid.NewGuid(), Guid.NewGuid());
@@ -74,7 +76,7 @@ namespace UnitTest
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
             // ARRANGE
-            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _interactorLog.Object);
+            var interactor = new LibraryCatalogueInteractor(_libraryCatalogueDaMock.Object, _userDataAccessMock.Object, _interactorLog.Object);
 
             // ACT
             Assert.ThrowsAsync<ArgumentNullException>(() => interactor.AddBook(null, new Guid(), new Guid()));

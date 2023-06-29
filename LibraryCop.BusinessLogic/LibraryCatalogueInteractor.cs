@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Utils;
+﻿using BusinessLogic;
+using BusinessLogic.Utils;
 using LibraryCop.BusinessLogic.DataAccess;
 using LibraryCop.BusinessLogic.Entities;
 using Microsoft.Extensions.Logging;
@@ -13,11 +14,13 @@ namespace LibraryCop.BusinessLogic
     public class LibraryCatalogueInteractor
     {
         private readonly ILibraryCatalogueDataAccess _libraryCatalogueDataAccess;
+        private readonly IUserDataAccess _userDataAccess;
         private readonly ILogger<LibraryCatalogueInteractor> _log;
 
-        public LibraryCatalogueInteractor(ILibraryCatalogueDataAccess libraryCatalogueDataAccess, ILogger<LibraryCatalogueInteractor> log)
+        public LibraryCatalogueInteractor(ILibraryCatalogueDataAccess libraryCatalogueDataAccess, IUserDataAccess userDataAccess, ILogger<LibraryCatalogueInteractor> log)
         {
             _libraryCatalogueDataAccess = libraryCatalogueDataAccess ?? throw new ArgumentNullException(nameof(libraryCatalogueDataAccess));
+            _userDataAccess = userDataAccess;
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
@@ -69,6 +72,13 @@ namespace LibraryCop.BusinessLogic
             var state = await _libraryCatalogueDataAccess.GetState(isbn, libraryID);
 
             state ??= new BookState(isbn, State.NotOwned, libraryID) { Created = DateTime.Now, CreatedBy = libraryID};
+
+            var user = await _userDataAccess.GetUser(state.LastChangedBy);
+
+            if (user != null)
+                state.LastChangedByName = user.Name;
+            else
+                _log.LogWarning("[{Class}.{Method}] User '{userID}' not found.", nameof(LibraryCatalogueInteractor), nameof(BorrowBook), state.LastChangedBy);
 
             return state;
         }

@@ -14,6 +14,7 @@ namespace LibraryCop.BusinessLogic.Entities
             ISBN = isbn;
             State = state;
             LibraryID = libraryID;
+            LastChangedByName = "Óþekktur notandi";
         }
 
         public string ISBN { get; set; }
@@ -38,6 +39,7 @@ namespace LibraryCop.BusinessLogic.Entities
 
         public DateTime LastChanged { get { return Changed ?? Created; } }
         public Guid LastChangedBy { get { return ChangedBy ?? CreatedBy; } }
+        public string LastChangedByName { get; set; }
     }
 
     public enum State

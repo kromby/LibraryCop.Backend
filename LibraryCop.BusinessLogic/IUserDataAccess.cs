@@ -10,5 +10,7 @@ namespace BusinessLogic
     public interface IUserDataAccess
     {
         Task<User?> GetUser(string username);
+
+        Task<User?> GetUser(Guid id);
     }
 }

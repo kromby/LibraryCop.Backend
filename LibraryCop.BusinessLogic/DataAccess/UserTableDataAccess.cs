@@ -41,7 +41,30 @@ namespace BusinessLogic.DataAccess
 
             _log.LogInformation("[{Class}.{Method}] User '{username}' not found.", nameof(UserTableDataAccess), nameof(GetUser), username);
             return null;
+        }        
+
+        public async Task<User?> GetUser(Guid id)
+        {
+            _log.LogInformation("[{Class}.{Method}] Looking for user '{userID}'.", nameof(UserTableDataAccess), nameof(GetUser), id);
+
+            var asyncResults = _tableClient.QueryAsync<UserModel>(x => x.RowKey == id.ToString());
+
+            int count = 0;
+            User? user = null;
+            await foreach (var userEntity in asyncResults)
+            {
+                user = ParseUserFromModel(userEntity);
+                count++;
+            }
+
+            if (count == 1)
+                return user;
+
+            _log.LogInformation("[{Class}.{Method}] User '{userID}' not found.", nameof(UserTableDataAccess), nameof(GetUser), id);
+            return null;
         }
+
+        #region Private helpers
 
         private static User ParseUserFromModel(UserModel userEntity)
         {
@@ -53,5 +76,7 @@ namespace BusinessLogic.DataAccess
                 Password = userEntity.Password
             };
         }
+
+        #endregion
     }
 }
