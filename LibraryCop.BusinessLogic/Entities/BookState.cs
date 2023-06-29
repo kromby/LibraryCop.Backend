@@ -26,7 +26,7 @@ namespace LibraryCop.BusinessLogic.Entities
             {
                 if (State == State.NotOwned) return "Bók ekki til í bókasafni";
                 else if (State == State.In) return "Bók er aðgengileg á bókasafninu";
-                else if (State == State.OnLoan) return string.Format("Bók er í láni hjá {0}", LastChangedBy.ToString());
+                else if (State == State.OnLoan) return string.Format("{0} er með bókina í útláni", LastChangedByName);
                 else return "Staða óþekkt";
             }
         }
